@@ -19,7 +19,7 @@ public class Main {
             System.out.println("5. Salir");
             System.out.print("Seleccione una opción: ");
 
-            opcion = leer.radix();leer.nextInt();
+            opcion =leer.nextInt();
             leer.nextLine();
 
             switch (opcion) {
