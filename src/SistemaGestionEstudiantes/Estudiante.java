@@ -1,74 +1,93 @@
 package SistemaGestionEstudiantes;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+
 /*
  * Clase: Estudiante
- * Representa a un estudiante con ID, nombre y calificaciones.
+ * Representa a un estudiante con:
+ * - ID autoincremental
+ * - Número de identificación (CC)
+ * - Nombre
+ * - Notas por materia (HashMap de ArrayList)
  */
 public class Estudiante {
-    private String id;                                      // Identificador del estudiante
-    private String nombre;                                  // Nombre del estudiante
-    private ArrayList<Double> listaCalificaciones;          // Lista de calificaciones
+
+    private String id;
+    private String identificacion;
+    private String nombre;
+
+    // Cada materia tiene una lista de calificaciones
+    private HashMap<String, ArrayList<Double>> notasPorMateria;
 
     /*
-     * Constructor que inicializa ID, nombre y lista vacía de calificaciones
+     * Constructor del estudiante
      */
-    public Estudiante(String id, String nombre) {
+    public Estudiante(String id, String identificacion, String nombre) {
         this.id = id;
+        this.identificacion = identificacion;
         this.nombre = nombre;
-        this.listaCalificaciones = new ArrayList<>();
+        this.notasPorMateria = new HashMap<>();
     }
 
-    /*
-     * Devuelve el ID del estudiante
-     */
     public String getId() {
         return id;
     }
 
-    /*
-     * Devuelve el nombre del estudiante
-     */
+    public String getIdentificacion() {
+        return identificacion;
+    }
+
     public String getNombre() {
         return nombre;
     }
 
     /*
-     * Agrega una calificación a la lista del estudiante
+     * Agrega una materia al estudiante (solo si aún no la tiene)
      */
-    public void agregarCalificacion(double calificacion) {
-        listaCalificaciones.add(calificacion);
+    public void agregarMateria(String materia) {
+        notasPorMateria.putIfAbsent(materia, new ArrayList<>());
     }
 
     /*
-     * Calcula y retorna el promedio de las calificaciones.
-     * Si no hay calificaciones, devuelve 0.
+     * Agrega una nota a la materia seleccionada.
      */
-    public double calcularPromedio() {
-        if (listaCalificaciones.isEmpty()) {
-            return 0.0;
-        }
+    public void agregarNota(String materia, double nota) {
+        agregarMateria(materia); // asegura que exista
+        notasPorMateria.get(materia).add(nota);
+    }
+
+    /*
+     * Calcula el promedio total del estudiante (promedio entre todas las materias)
+     */
+    public double promedioGeneral() {
         double suma = 0;
-        for (Double c : listaCalificaciones) {
-            suma += c;
+        int cantidad = 0;
+
+        for (String materia : notasPorMateria.keySet()) {
+            for (Double nota : notasPorMateria.get(materia)) {
+                suma += nota;
+                cantidad++;
+            }
         }
-        return suma / listaCalificaciones.size();
+
+        return cantidad == 0 ? 0 : suma / cantidad;
     }
 
     /*
-     * Devuelve la cantidad de calificaciones registradas
-     */
-    public int cantidadCalificaciones() {
-        return listaCalificaciones.size();
-    }
-
-    /*
-     * Devuelve una representación en texto del estudiante
-     * (Sin @Override porque el profesor no lo permite)
+     * Muestra todo el detalle del estudiante
      */
     public String toString() {
         return "ID: " + id +
+                " | CC: " + identificacion +
                 " | Nombre: " + nombre +
-                " | Calificaciones registradas: " + cantidadCalificaciones() +
-                " | Promedio: " + calcularPromedio();
+                " | Promedio general: " + promedioGeneral();
+    }
+
+    /*
+     * Obtiene todas las notas del estudiante
+     */
+    public HashMap<String, ArrayList<Double>> getNotasPorMateria() {
+        return notasPorMateria;
     }
 }

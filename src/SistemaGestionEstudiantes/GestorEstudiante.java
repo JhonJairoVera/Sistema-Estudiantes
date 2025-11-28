@@ -1,32 +1,39 @@
 package SistemaGestionEstudiantes;
+
 import java.util.ArrayList;
+
 /*
- * Clase: GestorEstudiantes
- * Administra la lista de estudiantes del sistema.
+ * Clase: GestorEstudiante
+ * Maneja:
+ * - Creación de estudiantes
+ * - Agregar notas por materia
+ * - Eliminación
+ * - Consulta
  */
 public class GestorEstudiante {
-    private ArrayList<Estudiante> estudiantes; // Lista de estudiantes registrados
 
-    /*
-     * Inicializa la lista vacía al crear el gestor
-     */
+    private ArrayList<Estudiante> estudiantes;
+    private int contadorId;
+
     public GestorEstudiante() {
         estudiantes = new ArrayList<>();
+        contadorId = 1;
     }
 
     /*
-     * Agrega un nuevo estudiante si el ID no está repetido
+     * Agrega estudiante con ID autoincremental
      */
-    public boolean agregarEstudiante(String id, String nombre) {
-        if (buscarPorId(id) != null) {
-            return false; // Ya existe
-        }
-        estudiantes.add(new Estudiante(id, nombre));
-        return true;
+    public String agregarEstudiante(String identificacion, String nombre) {
+        String id = String.valueOf(contadorId);
+        contadorId++;
+
+        estudiantes.add(new Estudiante(id, identificacion, nombre));
+
+        return id;
     }
 
     /*
-     * Busca un estudiante por su ID
+     * Busca estudiante por ID
      */
     public Estudiante buscarPorId(String id) {
         for (Estudiante e : estudiantes) {
@@ -38,26 +45,19 @@ public class GestorEstudiante {
     }
 
     /*
-     * Agrega una calificación a un estudiante existente
+     * Agrega nota en una materia a un estudiante
      */
-    public boolean agregarCalificacionAEstudiante(String id, double calificacion) {
+    public boolean agregarNota(String id, String materia, double nota) {
         Estudiante e = buscarPorId(id);
         if (e != null) {
-            e.agregarCalificacion(calificacion);
+            e.agregarNota(materia, nota);
             return true;
         }
         return false;
     }
 
     /*
-     * Retorna la lista completa de estudiantes
-     */
-    public ArrayList<Estudiante> consultarEstudiantes() {
-        return estudiantes;
-    }
-
-    /*
-     * Elimina un estudiante si existe
+     * Elimina estudiante
      */
     public boolean eliminarEstudiante(String id) {
         Estudiante e = buscarPorId(id);
@@ -66,5 +66,9 @@ public class GestorEstudiante {
             return true;
         }
         return false;
+    }
+
+    public ArrayList<Estudiante> getEstudiantes() {
+        return estudiantes;
     }
 }
