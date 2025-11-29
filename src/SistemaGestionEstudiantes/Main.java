@@ -89,7 +89,7 @@ public class Main {
                     System.out.print("Ingrese número de identificación (CC): ");
                     String identificacion = leer.nextLine();
 
-                    System.out.print("Ingrese nombre del estudiante: ");
+                    System.out.print("Ingrese nombre completo del estudiante: ");
                     String nombre = leer.nextLine();
 
                     String idGenerado = gestorEstudiantes.agregarEstudiante(identificacion, nombre);
