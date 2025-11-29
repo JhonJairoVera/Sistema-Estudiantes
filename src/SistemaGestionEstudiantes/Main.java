@@ -4,11 +4,7 @@ import java.util.Scanner;
 
 /*
  * Clase Main
- * Controla todo el flujo del sistema:
- * - Menú principal
- * - Menú del profesor
- * - Menú del estudiante
- * - Gestión de estudiantes, materias y notas
+ * Controla todo el menú principal, menú profesor y menú estudiante.
  */
 public class Main {
 
@@ -46,7 +42,7 @@ public class Main {
                     break;
 
                 default:
-                    System.out.println("⚠ Opción no válida");
+                    System.out.println("Opción no válida.");
             }
 
         } while (opcionPrincipal != 3);
@@ -58,8 +54,11 @@ public class Main {
     // MENÚ PROFESOR
     // =======================================================================================
 
-    public static void menuProfesor(Scanner leer, GestorEstudiante gestorEstudiantes, GestorMaterias gestorMaterias) {
-
+    public static void menuProfesor(
+            Scanner leer,
+            GestorEstudiante gestorEstudiantes,
+            GestorMaterias gestorMaterias
+    ) {
         int opcion;
 
         do {
@@ -77,7 +76,16 @@ public class Main {
 
             switch (opcion) {
 
+                // --------------------------- AGREGAR ESTUDIANTE ---------------------------
                 case 1:
+
+                    System.out.println("\n--- DESEA AGREGAR ESTUDIANTE ---");
+                    System.out.println("0. NO Volver");
+                    System.out.println("1. SI ");
+                    System.out.print("Opción: ");
+                    int sub1 = leer.nextInt(); leer.nextLine();
+                    if (sub1 == 0) break;
+
                     System.out.print("Ingrese número de identificación (CC): ");
                     String identificacion = leer.nextLine();
 
@@ -86,10 +94,11 @@ public class Main {
 
                     String idGenerado = gestorEstudiantes.agregarEstudiante(identificacion, nombre);
 
-                    System.out.println("\nEstudiante agregado correctamente");
+                    System.out.println("\nEstudiante agregado correctamente.");
                     System.out.println("ID interno generado: " + idGenerado);
                     break;
 
+                // --------------------------- CONSULTAR ESTUDIANTES ---------------------------
                 case 2:
                     System.out.println("\n===== LISTA DE ESTUDIANTES =====");
 
@@ -99,9 +108,8 @@ public class Main {
                         for (Estudiante e : gestorEstudiantes.getEstudiantes()) {
                             System.out.println(e.toString());
 
-                            // Mostrar notas por materia
                             e.getNotasPorMateria().forEach((materia, notas) -> {
-                                System.out.println(" - " + materia + ": " + notas);
+                                System.out.println("  - " + materia + ": " + notas);
                             });
 
                             System.out.println("----------------------------------");
@@ -109,7 +117,15 @@ public class Main {
                     }
                     break;
 
+                // --------------------------- AGREGAR NOTA ---------------------------
                 case 3:
+
+                    System.out.println("\n===== ESTUDIANTES REGISTRADOS =====");
+                    for (Estudiante e : gestorEstudiantes.getEstudiantes()) {
+                        System.out.println("ID: " + e.getId() + " | Nombre: " + e.getNombre());
+                    }
+                    System.out.println("----------------------------------");
+
                     System.out.print("Ingrese ID interno del estudiante: ");
                     String idCal = leer.nextLine();
 
@@ -120,13 +136,17 @@ public class Main {
                         break;
                     }
 
-                    // Mostrar información del estudiante
                     System.out.println("\nEstudiante encontrado:");
                     System.out.println("ID: " + est.getId());
                     System.out.println("Nombre: " + est.getNombre());
                     System.out.println("CC: " + est.getIdentificacion());
+                    System.out.println("\n--- DESEA AGREGAR NOTA ---");
+                    System.out.println("0. NO VOLVER ");
+                    System.out.println("1. SI CONTINUAR ");
+                    System.out.print("Opción: ");
+                    int sub3 = leer.nextInt(); leer.nextLine();
+                    if (sub3 == 0) break;
 
-                    // Mostrar materias disponibles
                     System.out.println("\nMaterias disponibles:");
                     int i = 1;
                     for (Materia m : gestorMaterias.getMaterias()) {
@@ -146,31 +166,55 @@ public class Main {
                     leer.nextLine();
 
                     if (nota < 0 || nota > 5) {
-                        System.out.println("⚠ La nota debe estar entre 0 y 5.");
+                        System.out.println("La nota debe estar entre 0 y 5.");
                         break;
                     }
 
                     gestorEstudiantes.agregarNota(idCal, materiaSeleccionada, nota);
-                    System.out.println("Nota registrada");
+                    System.out.println("Nota registrada correctamente.");
                     break;
 
+                // --------------------------- ELIMINAR ESTUDIANTE ---------------------------
                 case 4:
+
+
+
+                    System.out.println("\n===== ESTUDIANTES REGISTRADOS =====");
+                    for (Estudiante e : gestorEstudiantes.getEstudiantes()) {
+                        System.out.println("ID: " + e.getId() + " | Nombre: " + e.getNombre());
+                    }
+                    System.out.println("----------------------------------");
+                    System.out.println("\n--- SEGURO DE ELIMINAR ESTUDIANTE ---");
+                    System.out.println("0. NO Volver");
+                    System.out.println("1. SI Continuar");
+                    System.out.print("Opción: ");
+                    int sub4 = leer.nextInt(); leer.nextLine();
+                    if (sub4 == 0) break;
                     System.out.print("Ingrese ID del estudiante a eliminar: ");
                     String idEliminar = leer.nextLine();
 
                     if (gestorEstudiantes.eliminarEstudiante(idEliminar)) {
-                        System.out.println("Estudiante eliminado");
+                        System.out.println("Estudiante eliminado correctamente.");
                     } else {
-                        System.out.println("No existe ese ID");
+                        System.out.println("No existe un estudiante con ese ID.");
                     }
                     break;
 
+                // --------------------------- AGREGAR MATERIA ---------------------------
                 case 5:
+
+                    System.out.println("\n--- DESEA AGREGAR NUEVA  MATERIA ---");
+                    System.out.println("0. NO Volver");
+                    System.out.println("1. SI  Continuar");
+                    System.out.print("Opción: ");
+                    int sub5 = leer.nextInt(); leer.nextLine();
+                    if (sub5 == 0) break;
+
                     System.out.print("Ingrese nombre de la nueva materia: ");
                     String nuevaMateria = leer.nextLine();
 
                     if (gestorMaterias.agregarMateria(nuevaMateria)) {
-                        System.out.println("Materia agregada.");
+                        System.out.println("Materia agregada exitosamente.");
                     } else {
                         System.out.println("La materia ya existe.");
                     }
@@ -181,7 +225,7 @@ public class Main {
                     break;
 
                 default:
-                    System.out.println("⚠ Opción no válida.");
+                    System.out.println("Opción no válida.");
             }
 
         } while (opcion != 6);
@@ -191,12 +235,14 @@ public class Main {
     // MENÚ ESTUDIANTE
     // =======================================================================================
 
-    public static void menuEstudiante(Scanner leer, GestorEstudiante gestorEstudiantes) {
+    public static void menuEstudiante(
+            Scanner leer,
+            GestorEstudiante gestorEstudiantes
+    ) {
 
         System.out.print("Ingrese su número de identificación (CC): ");
         String cc = leer.nextLine();
 
-        // Buscar por CC (NO por ID interno)
         Estudiante encontrado = null;
 
         for (Estudiante e : gestorEstudiantes.getEstudiantes()) {
@@ -213,10 +259,10 @@ public class Main {
 
         System.out.println("\n===== BIENVENIDO " + encontrado.getNombre().toUpperCase() + " =====");
         System.out.println("ID interno: " + encontrado.getId());
-        System.out.println("Notas por materia:\n");
+        System.out.println("Notas por materia:");
 
         encontrado.getNotasPorMateria().forEach((materia, notas) -> {
-            System.out.println(materia + ": " + notas);
+            System.out.println(" - " + materia + ": " + notas);
         });
 
         System.out.println("\nPromedio general: " + encontrado.promedioGeneral());
