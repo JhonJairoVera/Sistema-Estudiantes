@@ -1,4 +1,5 @@
 package SistemaGestionEstudiantes;
+import SistemaGestionEstudiantes.database.DatabaseSetup;
 
 import java.util.Scanner;
 
@@ -9,6 +10,9 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
+        // Crear las tablas al iniciar el sistema
+        DatabaseSetup.crearTablas();
+
 
         Scanner leer = new Scanner(System.in);
 
