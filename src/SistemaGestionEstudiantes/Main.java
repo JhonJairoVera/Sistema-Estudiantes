@@ -1,18 +1,17 @@
 package SistemaGestionEstudiantes;
-import SistemaGestionEstudiantes.database.DatabaseSetup;
 
+import SistemaGestionEstudiantes.database.DatabaseSetup;
+import SistemaGestionEstudiantes.database.GestorEstudiante;
+
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
-/*
- * Clase Main
- * Controla todo el menú principal, menú profesor y menú estudiante.
- */
 public class Main {
 
     public static void main(String[] args) {
-        // Crear las tablas al iniciar el sistema
+        // Crear las tablas
         DatabaseSetup.crearTablas();
-
 
         Scanner leer = new Scanner(System.in);
 
@@ -54,15 +53,7 @@ public class Main {
         leer.close();
     }
 
-    // =======================================================================================
-    // MENÚ PROFESOR
-    // =======================================================================================
-
-    public static void menuProfesor(
-            Scanner leer,
-            GestorEstudiante gestorEstudiantes,
-            GestorMaterias gestorMaterias
-    ) {
+    public static void menuProfesor(Scanner leer, GestorEstudiante gestorEstudiantes, GestorMaterias gestorMaterias) {
         int opcion;
 
         do {
@@ -79,17 +70,13 @@ public class Main {
             leer.nextLine();
 
             switch (opcion) {
-
-                // --------------------------- AGREGAR ESTUDIANTE ---------------------------
                 case 1:
-
                     System.out.println("\n--- DESEA AGREGAR ESTUDIANTE ---");
                     System.out.println("0. NO Volver");
                     System.out.println("1. SI ");
                     System.out.print("Opción: ");
                     int sub1 = leer.nextInt(); leer.nextLine();
                     if (sub1 == 0) break;
-
                     System.out.print("Ingrese número de identificación (CC): ");
                     String identificacion = leer.nextLine();
 
@@ -98,72 +85,75 @@ public class Main {
 
                     String idGenerado = gestorEstudiantes.agregarEstudiante(identificacion, nombre);
 
-                    System.out.println("\nEstudiante agregado correctamente.");
-                    System.out.println("ID interno generado: " + idGenerado);
+                    if (idGenerado != null) {
+                        System.out.println("Estudiante agregado con ID: " + idGenerado);
+                    } else {
+                        System.out.println("Error agregando estudiante.");
+                    }
                     break;
 
-                // --------------------------- CONSULTAR ESTUDIANTES ---------------------------
                 case 2:
-                    System.out.println("\n===== LISTA DE ESTUDIANTES =====");
-
-                    if (gestorEstudiantes.getEstudiantes().isEmpty()) {
+                    List<Estudiante> estudiantes = gestorEstudiantes.getEstudiantes();
+                    if (estudiantes.isEmpty()) {
                         System.out.println("No hay estudiantes registrados.");
                     } else {
-                        for (Estudiante e : gestorEstudiantes.getEstudiantes()) {
+                        for (Estudiante e : estudiantes) {
                             System.out.println(e.toString());
 
-                            e.getNotasPorMateria().forEach((materia, notas) -> {
-                                System.out.println("  - " + materia + ": " + notas);
+                            Map<String, List<Double>> notas = gestorEstudiantes.getNotasPorMateria(e.getId());
+                            notas.forEach((materia, listaNotas) -> {
+                                System.out.println("  - " + materia + ": " + listaNotas);
                             });
+
+                            double promedio = gestorEstudiantes.promedioGeneral(e.getId());
+                            System.out.printf("Promedio general: %.2f\n", promedio);
 
                             System.out.println("----------------------------------");
                         }
                     }
                     break;
 
-                // --------------------------- AGREGAR NOTA ---------------------------
                 case 3:
-
-                    System.out.println("\n===== ESTUDIANTES REGISTRADOS =====");
-                    for (Estudiante e : gestorEstudiantes.getEstudiantes()) {
-                        System.out.println("ID: " + e.getId() + " | Nombre: " + e.getNombre());
-                    }
-                    System.out.println("----------------------------------");
-
-                    System.out.print("Ingrese ID interno del estudiante: ");
-                    String idCal = leer.nextLine();
-
-                    Estudiante est = gestorEstudiantes.buscarPorId(idCal);
-
-                    if (est == null) {
-                        System.out.println(" No existe un estudiante con ese ID.");
+                    List<Estudiante> listaEstudiantes = gestorEstudiantes.getEstudiantes();
+                    if (listaEstudiantes.isEmpty()) {
+                        System.out.println("No hay estudiantes registrados.");
                         break;
                     }
 
-                    System.out.println("\nEstudiante encontrado:");
-                    System.out.println("ID: " + est.getId());
-                    System.out.println("Nombre: " + est.getNombre());
-                    System.out.println("CC: " + est.getIdentificacion());
+                    System.out.println("Estudiantes:");
+                    for (Estudiante e : listaEstudiantes) {
+                        System.out.println("ID: " + e.getId() + " | Nombre: " + e.getNombre());
+                    }
                     System.out.println("\n--- DESEA AGREGAR NOTA ---");
                     System.out.println("0. NO VOLVER ");
                     System.out.println("1. SI CONTINUAR ");
                     System.out.print("Opción: ");
                     int sub3 = leer.nextInt(); leer.nextLine();
                     if (sub3 == 0) break;
+                    System.out.print("Ingrese ID interno del estudiante: ");
+                    String idCal = leer.nextLine();
 
-                    System.out.println("\nMaterias disponibles:");
-                    int i = 1;
-                    for (Materia m : gestorMaterias.getMaterias()) {
-                        System.out.println(i + ". " + m.getNombre());
-                        i++;
+                    Estudiante est = gestorEstudiantes.buscarPorId(idCal);
+                    if (est == null) {
+                        System.out.println("No existe un estudiante con ese ID.");
+                        break;
                     }
 
+                    System.out.println("\nMaterias disponibles:");
+                    List<Materia> materias = gestorMaterias.getMaterias();
+                    for (int i = 0; i < materias.size(); i++) {
+                        System.out.println((i + 1) + ". " + materias.get(i).getNombre());
+                    }
                     System.out.print("Seleccione la materia: ");
                     int opcionMateria = leer.nextInt();
                     leer.nextLine();
 
-                    String materiaSeleccionada =
-                            gestorMaterias.getMaterias().get(opcionMateria - 1).getNombre();
+                    if (opcionMateria < 1 || opcionMateria > materias.size()) {
+                        System.out.println("Opción de materia inválida.");
+                        break;
+                    }
+
+                    String materiaSeleccionada = materias.get(opcionMateria - 1).getNombre();
 
                     System.out.print("Ingrese nota (0 a 5): ");
                     double nota = leer.nextDouble();
@@ -174,17 +164,22 @@ public class Main {
                         break;
                     }
 
-                    gestorEstudiantes.agregarNota(idCal, materiaSeleccionada, nota);
-                    System.out.println("Nota registrada correctamente.");
+                    if (gestorEstudiantes.agregarNota(idCal, materiaSeleccionada, nota)) {
+                        System.out.println("Nota registrada correctamente.");
+                    } else {
+                        System.out.println("Error registrando nota.");
+                    }
                     break;
 
-                // --------------------------- ELIMINAR ESTUDIANTE ---------------------------
                 case 4:
+                    List<Estudiante> estEliminar = gestorEstudiantes.getEstudiantes();
+                    if (estEliminar.isEmpty()) {
+                        System.out.println("No hay estudiantes registrados.");
+                        break;
+                    }
 
-
-
-                    System.out.println("\n===== ESTUDIANTES REGISTRADOS =====");
-                    for (Estudiante e : gestorEstudiantes.getEstudiantes()) {
+                    System.out.println("Estudiantes:");
+                    for (Estudiante e : estEliminar) {
                         System.out.println("ID: " + e.getId() + " | Nombre: " + e.getNombre());
                     }
                     System.out.println("----------------------------------");
@@ -204,23 +199,14 @@ public class Main {
                     }
                     break;
 
-                // --------------------------- AGREGAR MATERIA ---------------------------
                 case 5:
-
-                    System.out.println("\n--- DESEA AGREGAR NUEVA  MATERIA ---");
-                    System.out.println("0. NO Volver");
-                    System.out.println("1. SI  Continuar");
-                    System.out.print("Opción: ");
-                    int sub5 = leer.nextInt(); leer.nextLine();
-                    if (sub5 == 0) break;
-
                     System.out.print("Ingrese nombre de la nueva materia: ");
                     String nuevaMateria = leer.nextLine();
 
                     if (gestorMaterias.agregarMateria(nuevaMateria)) {
                         System.out.println("Materia agregada exitosamente.");
                     } else {
-                        System.out.println("La materia ya existe.");
+                        System.out.println("La materia ya existe o hubo un error.");
                     }
                     break;
 
@@ -231,24 +217,14 @@ public class Main {
                 default:
                     System.out.println("Opción no válida.");
             }
-
         } while (opcion != 6);
     }
 
-    // =======================================================================================
-    // MENÚ ESTUDIANTE
-    // =======================================================================================
-
-    public static void menuEstudiante(
-            Scanner leer,
-            GestorEstudiante gestorEstudiantes
-    ) {
-
+    public static void menuEstudiante(Scanner leer, GestorEstudiante gestorEstudiantes) {
         System.out.print("Ingrese su número de identificación (CC): ");
         String cc = leer.nextLine();
 
         Estudiante encontrado = null;
-
         for (Estudiante e : gestorEstudiantes.getEstudiantes()) {
             if (e.getIdentificacion().equals(cc)) {
                 encontrado = e;
@@ -257,7 +233,7 @@ public class Main {
         }
 
         if (encontrado == null) {
-            System.out.println(" No existe estudiante con ese número de identificación.");
+            System.out.println("No existe estudiante con ese número de identificación.");
             return;
         }
 
@@ -265,10 +241,11 @@ public class Main {
         System.out.println("ID interno: " + encontrado.getId());
         System.out.println("Notas por materia:");
 
-        encontrado.getNotasPorMateria().forEach((materia, notas) -> {
-            System.out.println(" - " + materia + ": " + notas);
+        Map<String, List<Double>> notas = gestorEstudiantes.getNotasPorMateria(encontrado.getId());
+        notas.forEach((materia, listaNotas) -> {
+            System.out.println(" - " + materia + ": " + listaNotas);
         });
 
-        System.out.println("\nPromedio general: " + encontrado.promedioGeneral());
+        System.out.println("\nPromedio general: " + gestorEstudiantes.promedioGeneral(encontrado.getId()));
     }
 }

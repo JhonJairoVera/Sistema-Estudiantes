@@ -40,7 +40,7 @@ public class EstudianteDAO {
 
             while (rs.next()) {
                 Estudiante e = new Estudiante(
-                        String.valueOf(rs.getInt("id")),
+                        rs.getInt("id"),
                         rs.getString("cc"),
                         rs.getString("nombre")
                 );
@@ -67,7 +67,7 @@ public class EstudianteDAO {
 
             if (rs.next()) {
                 return new Estudiante(
-                        String.valueOf(rs.getInt("id")),
+                        rs.getInt("id"),
                         rs.getString("cc"),
                         rs.getString("nombre")
                 );
