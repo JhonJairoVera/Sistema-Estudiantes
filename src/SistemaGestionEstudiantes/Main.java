@@ -21,34 +21,50 @@ public class Main {
         int opcionPrincipal;
 
         do {
-            System.out.println("\n===== SISTEMA DE GESTIÓN ACADÉMICA =====");
-            System.out.println("Seleccione su rol:");
             System.out.println("1. Profesor");
             System.out.println("2. Estudiante");
-            System.out.println("3. Salir");
+            System.out.println("3. Opción extra");
+            System.out.println("4. Salir");
             System.out.print("Opción: ");
             opcionPrincipal = leer.nextInt();
             leer.nextLine();
 
             switch (opcionPrincipal) {
-
                 case 1:
-                    menuProfesor(leer, gestorEstudiantes, gestorMaterias);
-                    break;
 
+                    System.out.print("Ingrese la contraseña (4 dígitos): ");
+                    String pass = leer.nextLine();
+
+                    if (GestorContrasena.verificarContraseña(pass)) {
+                        menuProfesor(leer, gestorEstudiantes, gestorMaterias);
+                    } else {
+                        System.out.println("Contraseña incorrecta.");
+                    }
+                    break;
                 case 2:
                     menuEstudiante(leer, gestorEstudiantes);
                     break;
-
                 case 3:
-                    System.out.println("Saliendo del sistema...");
+                    System.out.println("\n===== PLAN PLUS =====");
+                    System.out.println("**********************");
+                    System.out.println("*   PLAN PLUS BASIC  *");
+                    System.out.println("*  - Acceso ilimitado*");
+                    System.out.println("*  - Soporte 24/7    *");
+                    System.out.println("*  - Actualizaciones *");
+                    System.out.println("**********************\n");
+
+                    System.out.println("Presiona ENTER para volver al menú principal...");
+                    leer.nextLine();  // Pausa para esperar que el usuario presione ENTER
                     break;
 
+                case 4:
+                    System.out.println("Saliendo del sistema...");
+                    break;
                 default:
                     System.out.println("Opción no válida.");
             }
 
-        } while (opcionPrincipal != 3);
+        } while (opcionPrincipal != 4);
 
         leer.close();
     }
@@ -63,7 +79,8 @@ public class Main {
             System.out.println("3. Agregar nota a estudiante");
             System.out.println("4. Eliminar estudiante");
             System.out.println("5. Agregar materia nueva");
-            System.out.println("6. Volver");
+            System.out.println("6. Modificar contraseña ");
+            System.out.println("7. Volver");
             System.out.print("Opción: ");
 
             opcion = leer.nextInt();
@@ -71,7 +88,7 @@ public class Main {
 
             switch (opcion) {
                 case 1:
-                    System.out.println("\n--- DESEA AGREGAR ESTUDIANTE ---");
+                    System.out.println("\n--- DESEA AGREGAR ESTUDIANTE ? ---");
                     System.out.println("0. NO Volver");
                     System.out.println("1. SI ");
                     System.out.print("Opción: ");
@@ -124,9 +141,9 @@ public class Main {
                     for (Estudiante e : listaEstudiantes) {
                         System.out.println("ID: " + e.getId() + " | Nombre: " + e.getNombre());
                     }
-                    System.out.println("\n--- DESEA AGREGAR NOTA ---");
+                    System.out.println("\n--- DESEA AGREGAR NOTA ? ---");
                     System.out.println("0. NO VOLVER ");
-                    System.out.println("1. SI CONTINUAR ");
+                    System.out.println("1. SI  ");
                     System.out.print("Opción: ");
                     int sub3 = leer.nextInt(); leer.nextLine();
                     if (sub3 == 0) break;
@@ -183,7 +200,7 @@ public class Main {
                         System.out.println("ID: " + e.getId() + " | Nombre: " + e.getNombre());
                     }
                     System.out.println("----------------------------------");
-                    System.out.println("\n--- SEGURO DE ELIMINAR ESTUDIANTE ---");
+                    System.out.println("\n--- ESTA SEGURO DE ELIMINAR UN  ESTUDIANTE ?---");
                     System.out.println("0. NO Volver");
                     System.out.println("1. SI Continuar");
                     System.out.print("Opción: ");
@@ -200,6 +217,13 @@ public class Main {
                     break;
 
                 case 5:
+                    System.out.println("\n--- DESEA AGREGAR MATERIA NUEVA ? ---");
+                    System.out.println("0. NO VOLVER ");
+                    System.out.println("1. SI  ");
+                    System.out.print("Opción: ");
+                    int sub5 = leer.nextInt(); leer.nextLine();
+                    if (sub5 == 0) break;
+
                     System.out.print("Ingrese nombre de la nueva materia: ");
                     String nuevaMateria = leer.nextLine();
 
@@ -209,15 +233,34 @@ public class Main {
                         System.out.println("La materia ya existe o hubo un error.");
                     }
                     break;
-
                 case 6:
+                    System.out.println("\n--- DESEA CAMBIAR LA CONTRASEÑA  ? ---");
+                    System.out.println("0. NO VOLVER ");
+                    System.out.println("1. SI  ");
+                    System.out.print("Opción: ");
+                    int sub6 = leer.nextInt(); leer.nextLine();
+                    if (sub6 == 0) break;
+                    System.out.print("Ingrese la nueva contraseña de 4 dígitos: ");
+                    String nuevaPass = leer.nextLine();
+
+                    if (nuevaPass.length() == 4 && nuevaPass.matches("\\d{4}")) {
+                        GestorContrasena.cambiarContraseña(nuevaPass);
+                        System.out.println("Contraseña cambiada correctamente.");
+                    } else {
+                        System.out.println("Contraseña inválida. Debe tener 4 dígitos numéricos.");
+                    }
+                    break;
+
+
+                case 7:
                     System.out.println("Volviendo al menú principal...");
                     break;
+
 
                 default:
                     System.out.println("Opción no válida.");
             }
-        } while (opcion != 6);
+        } while (opcion != 7);
     }
 
     public static void menuEstudiante(Scanner leer, GestorEstudiante gestorEstudiantes) {
