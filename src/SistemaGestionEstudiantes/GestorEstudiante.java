@@ -4,15 +4,15 @@ import SistemaGestionEstudiantes.Estudiante;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GestorEstudiante {
 
-    // ===============================
-    // LISTAR ESTUDIANTES (SELECT *)
-    // ===============================
+    // Listar estudiantes
     public ArrayList<Estudiante> getEstudiantes() {
         ArrayList<Estudiante> lista = new ArrayList<>();
-
         String sql = "SELECT id, cc, nombre FROM estudiantes";
 
         try (Connection conn = Conexion.conectar();
@@ -34,12 +34,8 @@ public class GestorEstudiante {
         return lista;
     }
 
-    // ============================================
-    // AGREGAR ESTUDIANTE (INSERT INTO)
-    // Devuelve el id generado como String o null si falla
-    // ============================================
+    // Agregar estudiante
     public String agregarEstudiante(String cc, String nombre) {
-
         String sql = "INSERT INTO estudiantes (cc, nombre) VALUES (?, ?)";
 
         try (Connection conn = Conexion.conectar();
@@ -49,7 +45,6 @@ public class GestorEstudiante {
             ps.setString(2, nombre);
             ps.executeUpdate();
 
-            // Obtener ID generado automáticamente
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     return String.valueOf(rs.getInt(1));
@@ -63,11 +58,8 @@ public class GestorEstudiante {
         return null;
     }
 
-    // ============================================
-    // BUSCAR ESTUDIANTE POR ID
-    // ============================================
+    // Buscar estudiante por ID
     public Estudiante buscarPorId(String idStr) {
-
         String sql = "SELECT id, cc, nombre FROM estudiantes WHERE id = ?";
 
         try (Connection conn = Conexion.conectar();
@@ -94,39 +86,8 @@ public class GestorEstudiante {
         return null;
     }
 
-    // ============================================
-    // BUSCAR ESTUDIANTE POR CC
-    // ============================================
-    public Estudiante buscarPorCC(String cc) {
-
-        String sql = "SELECT id, cc, nombre FROM estudiantes WHERE cc = ?";
-
-        try (Connection conn = Conexion.conectar();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, cc);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return new Estudiante(
-                            rs.getInt("id"),
-                            rs.getString("cc"),
-                            rs.getString("nombre")
-                    );
-                }
-            }
-
-        } catch (Exception e) {
-            System.out.println("Error al buscar por CC: " + e.getMessage());
-        }
-
-        return null;
-    }
-
-    // ============================================
-    // ELIMINAR ESTUDIANTE
-    // ============================================
+    // Eliminar estudiante
     public boolean eliminarEstudiante(String idStr) {
-
         String sql = "DELETE FROM estudiantes WHERE id = ?";
 
         try (Connection conn = Conexion.conectar();
@@ -147,77 +108,85 @@ public class GestorEstudiante {
         return false;
     }
 
-    /*
-     * Verifica si ya existe un estudiante con esa CC
-     */
-    public boolean existeCC(String cc) {
-        String sql = "SELECT COUNT(*) AS total FROM estudiantes WHERE cc = ?";
+    // Agregar nota para estudiante y materia
+    public boolean agregarNota(String idEstudianteStr, String nombreMateria, double nota) {
+        String sqlBuscarMateria = "SELECT id FROM materias WHERE nombre = ?";
+        String sqlInsertarNota = "INSERT INTO notas (id_estudiante, id_materia, nota) VALUES (?, ?, ?)";
+
+        try (Connection conn = Conexion.conectar();
+             PreparedStatement psBuscarMateria = conn.prepareStatement(sqlBuscarMateria);
+             PreparedStatement psInsertarNota = conn.prepareStatement(sqlInsertarNota)) {
+
+            int idEstudiante = Integer.parseInt(idEstudianteStr);
+
+            // Buscar id materia
+            psBuscarMateria.setString(1, nombreMateria);
+            ResultSet rs = psBuscarMateria.executeQuery();
+            if (!rs.next()) {
+                System.out.println("Materia no encontrada: " + nombreMateria);
+                return false;
+            }
+            int idMateria = rs.getInt("id");
+
+            // Insertar nota
+            psInsertarNota.setInt(1, idEstudiante);
+            psInsertarNota.setInt(2, idMateria);
+            psInsertarNota.setDouble(3, nota);
+
+            int filas = psInsertarNota.executeUpdate();
+            return filas > 0;
+
+        } catch (Exception e) {
+            System.out.println("Error agregando nota: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // Obtener notas por materia para un estudiante
+    public Map<String, List<Double>> getNotasPorMateria(int idEstudiante) {
+        String sql = "SELECT m.nombre as materia, n.nota FROM notas n " +
+                "JOIN materias m ON n.id_materia = m.id " +
+                "WHERE n.id_estudiante = ?";
+
+        Map<String, List<Double>> notasPorMateria = new HashMap<>();
 
         try (Connection conn = Conexion.conectar();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, cc);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("total") > 0; // si COUNT > 0 → ya existe
-                }
+            ps.setInt(1, idEstudiante);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String materia = rs.getString("materia");
+                double nota = rs.getDouble("nota");
+
+                notasPorMateria.computeIfAbsent(materia, k -> new ArrayList<>()).add(nota);
             }
 
         } catch (Exception e) {
-            System.out.println("Error verificando CC: " + e.getMessage());
+            System.out.println("Error obteniendo notas por materia: " + e.getMessage());
         }
-        return false;
+
+        return notasPorMateria;
     }
 
-    /*
-     * Obtiene un estudiante por su número de identificación (CC)
-     */
-    public Estudiante obtenerPorCC(String cc) {
-
-        String sql = "SELECT id, cc, nombre FROM estudiantes WHERE cc = ?";
+    // Calcular promedio general de un estudiante
+    public double promedioGeneral(int idEstudiante) {
+        String sql = "SELECT AVG(nota) as promedio FROM notas WHERE id_estudiante = ?";
 
         try (Connection conn = Conexion.conectar();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, cc);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return new Estudiante(
-                            rs.getInt("id"),
-                            rs.getString("cc"),
-                            rs.getString("nombre")
-                    );
-                }
+            ps.setInt(1, idEstudiante);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getDouble("promedio");
             }
 
         } catch (Exception e) {
-            System.out.println("Error buscando estudiante por CC: " + e.getMessage());
+            System.out.println("Error calculando promedio general: " + e.getMessage());
         }
-
-        return null;
-    }
-
-    /*
-     * Actualiza el nombre del estudiante
-     */
-    public boolean actualizarNombre(String idStr, String nuevoNombre) {
-
-        String sql = "UPDATE estudiantes SET nombre = ? WHERE id = ?";
-
-        try (Connection conn = Conexion.conectar();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            int id = Integer.parseInt(idStr);
-            ps.setString(1, nuevoNombre);
-            ps.setInt(2, id);
-
-            return ps.executeUpdate() > 0;
-
-        } catch (NumberFormatException nfe) {
-            System.out.println("ID inválido: " + idStr);
-        } catch (Exception e) {
-            System.out.println("Error actualizando estudiante: " + e.getMessage());
-        }
-        return false;
+        return 0.0;
     }
 }
