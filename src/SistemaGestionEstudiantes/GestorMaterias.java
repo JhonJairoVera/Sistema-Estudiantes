@@ -71,4 +71,24 @@ public class GestorMaterias {
             agregarMateria(m);
         }
     }
+
+    // ==========================================================
+// ELIMINAR MATERIA POR ID
+// ==========================================================
+    public boolean eliminarMateria(int id) {
+        String sql = "DELETE FROM materias WHERE id = ?";
+
+        try (Connection conn = Conexion.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+
+            int rows = stmt.executeUpdate();
+            return rows > 0; // true si eliminó algo
+
+        } catch (SQLException e) {
+            System.out.println("Error al eliminar materia: " + e.getMessage());
+            return false;
+        }
+    }
 }

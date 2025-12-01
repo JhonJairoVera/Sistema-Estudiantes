@@ -79,8 +79,9 @@ public class Main {
             System.out.println("3. Agregar nota a estudiante");
             System.out.println("4. Eliminar estudiante");
             System.out.println("5. Agregar materia nueva");
-            System.out.println("6. Modificar contraseña ");
-            System.out.println("7. Volver");
+            System.out.println("6. Eliminar Materia ");
+            System.out.println("7. Modificar contraseña ");
+            System.out.println("8. Volver");
             System.out.print("Opción: ");
 
             opcion = leer.nextInt();
@@ -234,6 +235,40 @@ public class Main {
                     }
                     break;
                 case 6:
+                    List<Materia> listaMaterias = gestorMaterias.getMaterias();
+
+                    if (listaMaterias.isEmpty()) {
+                        System.out.println("No hay materias registradas.");
+                        break;
+                    }
+
+                    System.out.println("\n===== MATERIAS DISPONIBLES =====");
+                    for (Materia m : listaMaterias) {
+                        System.out.println("ID: " + m.getId() + " | Nombre: " + m.getNombre());
+                    }
+
+                    System.out.println("\n--- ¿Desea eliminar una materia? ---");
+                    System.out.println("0. NO volver");
+                    System.out.println("1. SI eliminar");
+                    System.out.print("Opción: ");
+                    int confirmar = leer.nextInt();
+                    leer.nextLine();
+
+                    if (confirmar == 0) break;
+
+                    System.out.print("Ingrese el ID de la materia a eliminar: ");
+                    int idEliminarMateria = leer.nextInt();
+                    leer.nextLine();
+
+                    if (gestorMaterias.eliminarMateria(idEliminarMateria)) {
+                        System.out.println("Materia eliminada correctamente.");
+                    } else {
+                        System.out.println("No existe una materia con ese ID.");
+                    }
+
+                    break;
+
+                case 7:
                     System.out.println("\n--- DESEA CAMBIAR LA CONTRASEÑA  ? ---");
                     System.out.println("0. NO VOLVER ");
                     System.out.println("1. SI  ");
@@ -252,7 +287,7 @@ public class Main {
                     break;
 
 
-                case 7:
+                case 8:
                     System.out.println("Volviendo al menú principal...");
                     break;
 
@@ -260,7 +295,7 @@ public class Main {
                 default:
                     System.out.println("Opción no válida.");
             }
-        } while (opcion != 7);
+        } while (opcion != 8);
     }
 
     public static void menuEstudiante(Scanner leer, GestorEstudiante gestorEstudiantes) {
