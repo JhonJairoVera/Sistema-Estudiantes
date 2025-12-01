@@ -1,4 +1,6 @@
 package SistemaGestionEstudiantes;
+import java.util.ArrayList;
+import SistemaGestionEstudiantes.database.Nota;
 
 import SistemaGestionEstudiantes.database.DatabaseSetup;
 import SistemaGestionEstudiantes.database.GestorEstudiante;
@@ -8,6 +10,10 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
+    // DECLARAR AQUÍ LOS GESTORES (variables globales)
+    static GestorEstudiante gestorEstudiantes = new GestorEstudiante();
+    static GestorMaterias gestorMaterias = new GestorMaterias();
+    static GestorNotas gestorNotas = new GestorNotas();
 
     public static void main(String[] args) {
         // Crear las tablas
@@ -15,8 +21,11 @@ public class Main {
 
         Scanner leer = new Scanner(System.in);
 
-        GestorEstudiante gestorEstudiantes = new GestorEstudiante();
-        GestorMaterias gestorMaterias = new GestorMaterias();
+
+
+
+
+
 
         int opcionPrincipal;
 
@@ -79,9 +88,10 @@ public class Main {
             System.out.println("3. Agregar nota a estudiante");
             System.out.println("4. Eliminar estudiante");
             System.out.println("5. Agregar materia nueva");
-            System.out.println("6. Eliminar Materia ");
+            System.out.println("6. Eliminar materia ");
             System.out.println("7. Modificar contraseña ");
-            System.out.println("8. Volver");
+            System.out.println("8. Eliminar notas ");
+            System.out.println("9. Volver");
             System.out.print("Opción: ");
 
             opcion = leer.nextInt();
@@ -285,9 +295,39 @@ public class Main {
                         System.out.println("Contraseña inválida. Debe tener 4 dígitos numéricos.");
                     }
                     break;
-
-
                 case 8:
+                    System.out.println("\n--- LISTA DE NOTAS REGISTRADAS ---");
+
+                    ArrayList<Nota> notas = gestorNotas.obtenerNotas();
+
+                    if (notas.isEmpty()) {
+                        System.out.println("No hay notas registradas.");
+                        break;
+                    }
+
+                    for (Nota n : notas) {
+                        System.out.println("ID Nota: " + n.getId() +
+                                " | Estudiante ID: " + n.getIdEstudiante() +
+                                " | Materia ID: " + n.getIdMateria() +
+                                " | Nota: " + n.getNota());
+                    }
+
+                    System.out.print("\nIngrese el ID de la nota que desea eliminar: ");
+                    int idNotaEliminar = leer.nextInt();
+                    leer.nextLine();
+
+                    boolean eliminado = gestorNotas.eliminarNota(idNotaEliminar);
+
+                    if (eliminado) {
+                        System.out.println("✔ Nota eliminada correctamente.");
+                    } else {
+                        System.out.println("✘ No existe una nota con ese ID.");
+                    }
+
+                    break;
+
+
+                case 9:
                     System.out.println("Volviendo al menú principal...");
                     break;
 
@@ -295,7 +335,7 @@ public class Main {
                 default:
                     System.out.println("Opción no válida.");
             }
-        } while (opcion != 8);
+        } while (opcion != 9);
     }
 
     public static void menuEstudiante(Scanner leer, GestorEstudiante gestorEstudiantes) {
