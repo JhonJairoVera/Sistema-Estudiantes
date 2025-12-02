@@ -1,47 +1,43 @@
 package SistemaGestionEstudiantes;
+
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-/*
- * Clase Estudiante
- * Representa un estudiante con:
- * - ID (SQLite autoincremental)
- * - Número de identificación (CC)
- * - Nombre
- *
- * NOTA:
- * Ya NO guarda notas ni materias en memoria.
- * Las notas serán consultadas desde la base de datos mediante GestorEstudiante.
- */
+
 public class Estudiante {
+    private final IntegerProperty id = new SimpleIntegerProperty();
+    private final StringProperty identificacion = new SimpleStringProperty();
+    private final StringProperty nombre = new SimpleStringProperty();
 
-    private int id;              // ID de base de datos
-    private String identificacion;
-    private String nombre;
+    // Constructor vacío
+    public Estudiante() {}
 
+    // Constructor con parámetros (para tu GestorEstudiante)
     public Estudiante(int id, String identificacion, String nombre) {
-        this.id = id;
-        this.identificacion = identificacion;
-        this.nombre = nombre;
+        this.id.set(id);
+        this.identificacion.set(identificacion);
+        this.nombre.set(nombre);
     }
 
-    public int getId() {
-        return id;
-    }
+    // ===== PROPERTIES para JavaFX (ESTOS son los que faltan) =====
+    public IntegerProperty idProperty() { return id; }
+    public StringProperty identificacionProperty() { return identificacion; }
+    public StringProperty nombreProperty() { return nombre; }
 
-    public String getIdentificacion() {
-        return identificacion;
-    }
+    // ===== GETTERS tradicionales =====
+    public int getId() { return id.get(); }
+    public String getIdentificacion() { return identificacion.get(); }
+    public String getNombre() { return nombre.get(); }
 
-    public String getNombre() {
-        return nombre;
-    }
+    // ===== SETTERS tradicionales =====
+    public void setId(int id) { this.id.set(id); }
+    public void setIdentificacion(String identificacion) { this.identificacion.set(identificacion); }
+    public void setNombre(String nombre) { this.nombre.set(nombre); }
 
+    // toString para consola
     @Override
     public String toString() {
-        return "ID: " + id +
-                " | CC: " + identificacion +
-                " | Nombre: " + nombre;
+        return "ID: " + getId() + ", CC: " + getIdentificacion() + ", Nombre: " + getNombre();
     }
 }
