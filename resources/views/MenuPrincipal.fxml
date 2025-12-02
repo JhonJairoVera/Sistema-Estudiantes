@@ -2,55 +2,95 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #1D1D47;"
-            xmlns="http://javafx.com/javafx/17.0.12"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="SistemaGestionEstudiantes.controllers.MenuPrincipalController">
+<AnchorPane prefHeight="550.0" prefWidth="800.0" style="-fx-background-color: #0F0F2D;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SistemaGestionEstudiantes.controllers.MenuPrincipalController">
 
-    <children>
-        <VBox fx:id="mainVBox" layoutX="192.0" layoutY="187.0" prefHeight="199.0" prefWidth="261.0"
-              spacing="20" style="-fx-background-color: rgba(255,255,255,0.8); -fx-background-radius: 10;"
-              AnchorPane.bottomAnchor="106.0" AnchorPane.leftAnchor="192.0"
-              AnchorPane.rightAnchor="170.0" AnchorPane.topAnchor="187.0">
+    <!-- Fondo decorativo -->
+    <Rectangle fill="linear-gradient(to bottom right, #0F0F2D, #1A1A3E)" height="550" width="800" />
 
-            <children>
-                <Label style="-fx-text-fill: black;" text="Seleccione el tipo de usuario">
-                    <font>
-                        <Font name="Calibri" size="19.0" />
-                    </font>
-                </Label>
+    <!-- Encabezado -->
+    <VBox alignment="CENTER" spacing="5" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
+        <Label style="-fx-text-fill: white; -fx-font-size: 28px;" text="SISTEMA DE" />
+        <Label style="-fx-text-fill: #73FFFF; -fx-font-size: 36px; -fx-font-weight: bold;" text="GESTIÓN ESTUDIANTIL" />
+        <Separator prefWidth="400" style="-fx-background-color: #73FFFF; -fx-padding: 2 0 0 0;" />
+    </VBox>
 
-                <Button fx:id="btnDocente" maxWidth="Infinity" prefHeight="42.0" prefWidth="222.0"
-                        style="-fx-background-color: #73FFFF; -fx-cursor: hand;"
-                        text="Docente"
-                        onAction="#abrirMenuProfesor"/>
+    <!-- Contenedor de tarjetas -->
+    <HBox alignment="CENTER" spacing="40" AnchorPane.bottomAnchor="150.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="150.0">
 
-                <Button fx:id="btnEstudiante" maxWidth="Infinity" prefHeight="58.0" prefWidth="222.0"
-                        style="-fx-background-color: #73FFFF; -fx-cursor: hand;"
-                        text="Estudiante"
-                        onAction="#abrirMenuEstudiante"/>
-
-                <Button fx:id="btnExtra" maxWidth="Infinity" prefHeight="50.0" prefWidth="222.0"
-                        style="-fx-background-color: #73FFFF; -fx-cursor: hand;"
-                        text="Extra"
-                        onAction="#mostrarExtra"/>
-            </children>
+        <!-- Tarjeta Docente -->
+        <VBox alignment="CENTER" prefHeight="250" prefWidth="220" spacing="15" style="-fx-background-color: rgba(33, 150, 243, 0.1); -fx-background-radius: 20; -fx-border-color: #2196F3; -fx-border-radius: 20; -fx-border-width: 2;">
 
             <padding>
-                <Insets bottom="20" left="20" right="20" top="20" />
+                <Insets bottom="30" left="20" right="20" top="30" />
             </padding>
+
+            <Label style="-fx-font-size: 40px;" text="👨‍🏫" />
+            <Label style="-fx-text-fill: #2196F3; -fx-font-size: 18px; -fx-font-weight: bold;" text="DOCENTE" />
+            <Separator prefWidth="150" />
+            <Text style="-fx-text-fill: #CCCCCC; -fx-font-size: 12px;" text="Acceso con contraseña para gestión completa del sistema académico." textAlignment="CENTER" wrappingWidth="180" />
+
+            <Button fx:id="btnDocente" onAction="#abrirMenuProfesor" prefHeight="40" prefWidth="160" style="-fx-background-color: #2196F3; -fx-background-radius: 20; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="ACCEDER">
+                <effect>
+                    <Glow level="0.3" />
+                </effect>
+            </Button>
         </VBox>
 
-        <Button fx:id="btnCerrar" prefHeight="26" prefWidth="122"
-                text="Cerrar y salir"
-                onAction="#cerrarAplicacion"
-                AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" />
+        <!-- Tarjeta Estudiante -->
+        <VBox alignment="CENTER" prefHeight="250" prefWidth="220" spacing="15" style="-fx-background-color: rgba(76, 175, 80, 0.1); -fx-background-radius: 20; -fx-border-color: #4CAF50; -fx-border-radius: 20; -fx-border-width: 2;">
 
-        <!-- Resto de tu código... -->
+            <padding>
+                <Insets bottom="30" left="20" right="20" top="30" />
+            </padding>
 
-    </children>
+            <Label style="-fx-font-size: 40px;" text="👨‍🎓" />
+            <Label style="-fx-text-fill: #4CAF50; -fx-font-size: 18px; -fx-font-weight: bold;" text="ESTUDIANTE" />
+            <Separator prefWidth="150" />
+            <Text style="-fx-text-fill: #CCCCCC; -fx-font-size: 12px;" text="Consulta de notas, promedios y estado académico con número de identificación." textAlignment="CENTER" wrappingWidth="180" />
+
+            <Button fx:id="btnEstudiante" onAction="#abrirMenuEstudiante" prefHeight="40" prefWidth="160" style="-fx-background-color: #4CAF50; -fx-background-radius: 20; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="CONSULTAR">
+                <effect>
+                    <Glow level="0.3" />
+                </effect>
+            </Button>
+        </VBox>
+
+        <!-- Tarjeta Premium -->
+        <VBox alignment="CENTER" prefHeight="250" prefWidth="220" spacing="15" style="-fx-background-color: rgba(156, 39, 176, 0.1); -fx-background-radius: 20; -fx-border-color: #9C27B0; -fx-border-radius: 20; -fx-border-width: 2;">
+
+            <padding>
+                <Insets bottom="30" left="20" right="20" top="30" />
+            </padding>
+
+            <Label style="-fx-font-size: 40px;" text="💎" />
+            <Label style="-fx-text-fill: #9C27B0; -fx-font-size: 18px; -fx-font-weight: bold;" text="PREMIUM" />
+            <Separator prefWidth="150" />
+            <Text style="-fx-text-fill: #CCCCCC; -fx-font-size: 12px;" text="Descubre nuestros planes especiales y características premium disponibles." textAlignment="CENTER" wrappingWidth="180" />
+
+            <Button fx:id="btnExtra" onAction="#mostrarExtra" prefHeight="40" prefWidth="160" style="-fx-background-color: #9C27B0; -fx-background-radius: 20; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="VER PLANES">
+                <effect>
+                    <Glow level="0.3" />
+                </effect>
+            </Button>
+        </VBox>
+    </HBox>
+
+    <!-- Pie de página -->
+    <HBox alignment="CENTER" spacing="20" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+        <Button fx:id="btnCerrar" onAction="#cerrarAplicacion" prefHeight="35" prefWidth="100" style="-fx-background-color: #F44336; -fx-background-radius: 17; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="SALIR" />
+
+        <Label style="-fx-text-fill: #888888; -fx-font-size: 12px;" text="Sistema seguro | Versión 2.0 | © 2024" />
+    </HBox>
+   <ImageView fitHeight="65.0" fitWidth="94.0" layoutX="3.0" layoutY="-13.0" pickOnBounds="true" preserveRatio="true">
+      <image>
+         <Image url="@../images/WhatsApp%20Image%202025-11-25%20at%2015.45.24_45df644b.jpg" />
+      </image>
+   </ImageView>
+
 </AnchorPane>

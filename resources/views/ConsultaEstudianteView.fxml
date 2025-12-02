@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15" style="-fx-padding: 20; -fx-background-color: #1D1D47;"
+      xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="SistemaGestionEstudiantes.controllers.ConsultaEstudianteController">
+
+    <!-- Título -->
+    <Label text="📚 Consulta de Notas"
+           style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" />
+
+    <!-- Campo de búsqueda -->
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label text="Número de Identificación:"
+               style="-fx-text-fill: white;" />
+        <TextField fx:id="txtIdentificacion"
+                   promptText="Ej: 123456789"
+                   style="-fx-pref-width: 250;" />
+        <Button onAction="#buscarEstudiante"
+                text="Buscar"
+                style="-fx-background-color: #73FFFF; -fx-text-fill: black;" />
+    </HBox>
+
+    <!-- Área de resultados -->
+    <TextArea fx:id="areaResultado"
+              style="-fx-pref-height: 350; -fx-font-family: 'Arial';"
+              editable="false"
+              wrapText="true" />
+
+    <!-- Botones -->
+    <HBox spacing="15" alignment="CENTER">
+        <Button onAction="#nuevaBusqueda"
+                text="Nueva Búsqueda"
+                style="-fx-background-color: #4CAF50; -fx-text-fill: white;" />
+        <Button onAction="#cerrarVentana"
+                text="Cerrar"
+                style="-fx-background-color: #F44336; -fx-text-fill: white;" />
+    </HBox>
+
+</VBox>
