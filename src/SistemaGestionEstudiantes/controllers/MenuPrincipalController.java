@@ -94,10 +94,10 @@ public class MenuPrincipalController {
             stage.setScene(new Scene(root, 700, 500));
             stage.show();
 
-            System.out.println("✅ Ventana abierta correctamente");
+            System.out.println(" Ventana abierta correctamente");
 
         } catch (Exception e) {
-            System.err.println("❌ Error: " + e.getMessage());
+            System.err.println(" Error: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -110,7 +110,7 @@ public class MenuPrincipalController {
             VBox root = new VBox(20);
             root.setStyle("-fx-padding: 30; -fx-background-color: #1D1D47;");
 
-            Label titulo = new Label("📚 Consulta de Notas");
+            Label titulo = new Label(" Consulta de Notas");
             titulo.setStyle("-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;");
 
             HBox hbox = new HBox(10);

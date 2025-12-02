@@ -33,7 +33,7 @@ public class ConsultaEstudianteController {
 
     @FXML
     private void initialize() {
-        System.out.println("✅ Controlador de consulta inicializado");
+        System.out.println("Controlador de consulta inicializado");
         areaResultado.setText("Sistema de consulta de notas\n\n" +
                 "Ingrese su número de identificación y presione Buscar");
     }
@@ -65,7 +65,7 @@ public class ConsultaEstudianteController {
         if (estudiante == null) {
             mostrarAlerta("Error", "No se encontró un estudiante con la identificación: " + identificacion,
                     Alert.AlertType.ERROR);
-            areaResultado.setText("❌ No se encontró ningún estudiante con la identificación:\n" + identificacion);
+            areaResultado.setText(" No se encontró ningún estudiante con la identificación:\n" + identificacion);
             return;
         }
 
@@ -89,7 +89,7 @@ public class ConsultaEstudianteController {
                     "Identificación: " + estudiante.getIdentificacion() + "\n" +
                     "Nombre: " + estudiante.getNombre() + "\n" +
                     "ID Interno: EST" + String.format("%03d", estudiante.getId()) + "\n\n" +
-                    "📊 NOTAS: \n" +
+                    "NOTAS: \n" +
                     "El estudiante no tiene notas registradas.\n";
             areaResultado.setText(mensajeSinNotas);
             return;
@@ -110,7 +110,7 @@ public class ConsultaEstudianteController {
         resultado.append("Nombre: ").append(estudiante.getNombre()).append("\n");
         resultado.append("ID: ").append(estudiante.getId()).append("\n\n");
 
-        resultado.append("📊 NOTAS POR MATERIA:\n\n");
+        resultado.append("NOTAS POR MATERIA:\n\n");
 
         // Obtener materias para mostrar nombres
         List<Materia> materias = gestorMaterias.getMaterias();

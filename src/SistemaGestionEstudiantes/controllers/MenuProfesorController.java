@@ -432,7 +432,7 @@ public class MenuProfesorController {
 
         if (totalNotas > 0) {
             promedioGeneral /= totalNotas;
-            mensaje.append("🎯 PROMEDIO GENERAL: ").append(String.format("%.2f", promedioGeneral));
+            mensaje.append(" PROMEDIO GENERAL: ").append(String.format("%.2f", promedioGeneral));
         }
 
         // Mostrar diálogo con las notas
