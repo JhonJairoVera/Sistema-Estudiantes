@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="SistemaGestionEstudiantes.controllers.MenuProfesorController"
+            prefHeight="700" prefWidth="900"
+            style="-fx-padding: 20; -fx-background-color: #f0f0f0;">
+
+    <!-- TOP: Título -->
+    <top>
+        <HBox alignment="CENTER" style="-fx-padding: 0 0 20 0;">
+            <Label text="MENÚ DEL PROFESOR"
+                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1D1D47;"/>
+        </HBox>
+    </top>
+
+    <!-- CENTER: Pestañas -->
+    <center>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
+
+            <!-- Pestaña 1: Estudiantes -->
+            <Tab text="Gestión de Estudiantes">
+                <ScrollPane fitToWidth="true">
+                    <VBox spacing="20" style="-fx-padding: 20;">
+
+                        <!-- Sección: Agregar Estudiante -->
+                        <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 10;">
+                            <Label text="AGREGAR NUEVO ESTUDIANTE" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                            <GridPane hgap="10" vgap="10">
+                                <Label text="Identificación (CC):" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                <TextField fx:id="txtIdentificacion" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                           promptText="Número de identificación"/>
+
+                                <Label text="Nombre Completo:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                <TextField fx:id="txtNombre" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                                           promptText="Nombre del estudiante"/>
+                            </GridPane>
+
+                            <Button text="Agregar Estudiante" onAction="#agregarEstudiante"
+                                    style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                        </VBox>
+
+                        <!-- Sección: Lista de Estudiantes -->
+                        <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 10;">
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <Label text="LISTA DE ESTUDIANTES" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                                <TextField fx:id="txtBuscar" promptText="Buscar estudiante..."
+                                           style="-fx-pref-width: 200;"/>
+                                <Button text="Buscar" onAction="#buscarEstudiante"/>
+                            </HBox>
+
+                            <TableView fx:id="tablaEstudiantes" prefHeight="300">
+                                <columns>
+                                    <TableColumn fx:id="colId" text="ID" prefWidth="100"/>
+                                    <TableColumn fx:id="colIdentificacion" text="Identificación" prefWidth="150"/>
+                                    <TableColumn fx:id="colNombre" text="Nombre" prefWidth="300"/>
+                                </columns>
+                            </TableView>
+
+                            <HBox spacing="10">
+                                <Button text="Ver Notas del Seleccionado" style="-fx-background-color: #2196F3; -fx-text-fill: white;"/>
+                                <Button text="Eliminar Seleccionado" onAction="#eliminarEstudiante"
+                                        style="-fx-background-color: #F44336; -fx-text-fill: white;"/>
+                            </HBox>
+                        </VBox>
+                    </VBox>
+                </ScrollPane>
+            </Tab>
+
+            <!-- Pestaña 2: Notas -->
+            <Tab text="Gestión de Notas">
+                <VBox spacing="20" style="-fx-padding: 20;">
+                    <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 10;">
+                        <Label text="AGREGAR NUEVA NOTA" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                        <GridPane hgap="10" vgap="10">
+                            <Label text="Estudiante:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <ComboBox fx:id="comboEstudiantes" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                      promptText="Seleccionar estudiante" prefWidth="300"/>
+
+                            <Label text="Materia:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <ComboBox fx:id="comboMaterias" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                                      promptText="Seleccionar materia"/>
+
+                            <Label text="Nota (0-5):" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                            <TextField fx:id="txtNota" GridPane.rowIndex="2" GridPane.columnIndex="1"
+                                       promptText="Ej: 4.5"/>
+                        </GridPane>
+
+                        <Button text="Agregar Nota" onAction="#agregarNota"
+                                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                    </VBox>
+                </VBox>
+            </Tab>
+
+            <!-- Pestaña 3: Materias -->
+            <Tab text="Gestión de Materias">
+                <VBox spacing="20" style="-fx-padding: 20;">
+
+                    <!-- Agregar materia -->
+                    <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 10;">
+                        <Label text="AGREGAR NUEVA MATERIA" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                        <HBox spacing="10">
+                            <TextField fx:id="txtNuevaMateria" promptText="Nombre de la materia"
+                                       style="-fx-pref-width: 300;"/>
+                            <Button text="Agregar Materia" onAction="#agregarMateria"
+                                    style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Lista de materias -->
+                    <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 10;">
+                        <Label text="MATERIAS REGISTRADAS" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                        <ListView fx:id="listaMaterias" prefHeight="200"/>
+
+                        <HBox spacing="10">
+                            <Button text="Eliminar Materia Seleccionada" onAction="#eliminarMateria"
+                                    style="-fx-background-color: #F44336; -fx-text-fill: white;"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+            </Tab>
+
+            <!-- Pestaña 4: Configuración -->
+            <Tab text="Configuración">
+                <VBox spacing="20" style="-fx-padding: 20;">
+                    <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 10;">
+                        <Label text="CAMBIAR CONTRASEÑA" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                        <GridPane hgap="10" vgap="10">
+                            <Label text="Nueva Contraseña (4 dígitos):" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <PasswordField fx:id="txtNuevaContrasena" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                           promptText="0000"/>
+                        </GridPane>
+
+                        <Button text="Cambiar Contraseña" onAction="#cambiarContrasena"
+                                style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                    </VBox>
+                </VBox>
+            </Tab>
+        </TabPane>
+    </center>
+
+    <!-- BOTTOM: Botón volver -->
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" style="-fx-padding: 20 0 0 0;">
+            <Button text="Volver al Menú Principal" onAction="#volverAlMenuPrincipal"
+                    style="-fx-background-color: #1D1D47; -fx-text-fill: white; -fx-font-weight: bold;"/>
+        </HBox>
+    </bottom>
+</BorderPane>
