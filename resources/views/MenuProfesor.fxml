@@ -64,7 +64,9 @@
                             </TableView>
 
                             <HBox spacing="10">
-                                <Button text="Ver Notas del Seleccionado" style="-fx-background-color: #2196F3; -fx-text-fill: white;"/>
+                                <!-- CORRECCIÓN: Agregado onAction -->
+                                <Button text="Ver Notas del Seleccionado" onAction="#verNotasDelSeleccionado"
+                                        style="-fx-background-color: #2196F3; -fx-text-fill: white;"/>
                                 <Button text="Eliminar Seleccionado" onAction="#eliminarEstudiante"
                                         style="-fx-background-color: #F44336; -fx-text-fill: white;"/>
                             </HBox>
@@ -95,6 +97,13 @@
 
                         <Button text="Agregar Nota" onAction="#agregarNota"
                                 style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                    </VBox>
+
+                    <!-- NUEVA SECCIÓN: Eliminar Nota -->
+                    <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 10;">
+                        <Label text="ELIMINAR NOTA" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                        <Button text="Eliminar Nota" onAction="#eliminarNota"
+                                style="-fx-background-color: #F44336; -fx-text-fill: white; -fx-font-weight: bold;"/>
                     </VBox>
                 </VBox>
             </Tab>

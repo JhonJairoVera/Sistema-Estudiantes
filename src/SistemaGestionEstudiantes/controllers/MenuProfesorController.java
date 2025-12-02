@@ -1,5 +1,10 @@
 package SistemaGestionEstudiantes.controllers;
-// Añade estas importaciones si no las tienes:
+
+import SistemaGestionEstudiantes.GestorNotas;
+import SistemaGestionEstudiantes.database.Nota;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import javafx.event.ActionEvent;
 import javafx.stage.Window;
 import javafx.fxml.FXML;
@@ -46,6 +51,7 @@ public class MenuProfesorController {
 
     private GestorEstudiante gestorEstudiantes = new GestorEstudiante();
     private GestorMaterias gestorMaterias = new GestorMaterias();
+    private GestorNotas gestorNotas = new GestorNotas();
 
     @FXML
     public void initialize() {
@@ -54,33 +60,14 @@ public class MenuProfesorController {
     }
 
     private void configurarTabla() {
-        // VERSIÓN 1: Usando .asString() (más limpio)
         colId.setCellValueFactory(cellData ->
-                cellData.getValue().idProperty().asString());  // ¡IMPORTANTE: .asString()!
+                cellData.getValue().idProperty().asString());
 
         colIdentificacion.setCellValueFactory(cellData ->
                 cellData.getValue().identificacionProperty());
 
         colNombre.setCellValueFactory(cellData ->
                 cellData.getValue().nombreProperty());
-
-        /*
-        // VERSIÓN 2: Usando SimpleStringProperty (si la primera no funciona)
-        colId.setCellValueFactory(cellData -> {
-            Estudiante e = cellData.getValue();
-            return new SimpleStringProperty(String.valueOf(e.getId()));
-        });
-
-        colIdentificacion.setCellValueFactory(cellData -> {
-            Estudiante e = cellData.getValue();
-            return new SimpleStringProperty(e.getIdentificacion());
-        });
-
-        colNombre.setCellValueFactory(cellData -> {
-            Estudiante e = cellData.getValue();
-            return new SimpleStringProperty(e.getNombre());
-        });
-        */
     }
 
     private void cargarDatos() {
@@ -280,30 +267,24 @@ public class MenuProfesorController {
     }
 
     @FXML
-
-    private void volverAlMenuPrincipal(ActionEvent event) {  // ¡Recibe el event como parámetro!
+    private void volverAlMenuPrincipal(ActionEvent event) {
         System.out.println("Volviendo al menú principal...");
 
         try {
-            // FORMA CORRECTA: Usar el evento recibido como parámetro
             if (event != null && event.getSource() instanceof javafx.scene.Node) {
                 Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
                 stage.close();
             }
-            // FORMA ALTERNATIVA: Usar cualquier componente de la escena
             else if (tablaEstudiantes != null) {
                 Stage stage = (Stage) tablaEstudiantes.getScene().getWindow();
                 stage.close();
             }
 
-            // Abrir menú principal
             abrirVentanaMenuPrincipal();
 
         } catch (Exception e) {
             System.err.println("Error al volver al menú principal: " + e.getMessage());
             e.printStackTrace();
-
-            // Si todo falla, cerrar cualquier ventana visible
             cerrarVentanaActual();
         }
     }
@@ -336,7 +317,6 @@ public class MenuProfesorController {
 
     private void cerrarVentanaActual() {
         try {
-            // Cerrar la primera ventana que esté mostrando
             for (Window window : Window.getWindows()) {
                 if (window.isShowing() && window instanceof Stage) {
                     ((Stage) window).close();
@@ -360,5 +340,233 @@ public class MenuProfesorController {
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();
+    }
+
+    @FXML
+    private void verNotasDelSeleccionado() {
+        Estudiante estudianteSeleccionado = tablaEstudiantes.getSelectionModel().getSelectedItem();
+
+        if (estudianteSeleccionado == null) {
+            mostrarAlerta("Error", "Seleccione un estudiante de la tabla", Alert.AlertType.WARNING);
+            return;
+        }
+
+        // Obtener todas las notas
+        ArrayList<Nota> todasNotas = gestorNotas.obtenerNotas();
+
+        // DEBUG: Verificar datos
+        System.out.println("=== DEBUG ===");
+        System.out.println("Estudiante seleccionado ID: " + estudianteSeleccionado.getId());
+        System.out.println("Total notas en sistema: " + todasNotas.size());
+
+        // Filtrar notas del estudiante seleccionado - CORRECCIÓN AQUÍ
+        ArrayList<Nota> notasEstudiante = new ArrayList<>();
+        for (Nota nota : todasNotas) {
+            // COMPARACIÓN CORREGIDA: Comparar int con int
+            if (nota.getIdEstudiante() == estudianteSeleccionado.getId()) {
+                notasEstudiante.add(nota);
+                System.out.println("Nota encontrada: " + nota.getId() + " - " + nota.getNota());
+            }
+        }
+
+        if (notasEstudiante.isEmpty()) {
+            mostrarAlerta("Información",
+                    "El estudiante " + estudianteSeleccionado.getNombre() +
+                            " no tiene notas registradas.",
+                    Alert.AlertType.INFORMATION);
+            return;
+        }
+
+        // Construir mensaje con las notas
+        StringBuilder mensaje = new StringBuilder();
+        mensaje.append("=== NOTAS DE ").append(estudianteSeleccionado.getNombre().toUpperCase()).append(" ===\n\n");
+        mensaje.append("ID: ").append(estudianteSeleccionado.getId()).append("\n");
+        mensaje.append("Identificación: ").append(estudianteSeleccionado.getIdentificacion()).append("\n\n");
+
+        // Obtener materias para mostrar nombres
+        List<Materia> materias = gestorMaterias.getMaterias();
+
+        // Agrupar notas por materia
+        Map<String, ArrayList<Double>> notasPorMateria = new HashMap<>();
+
+        for (Nota nota : notasEstudiante) {
+            String nombreMateria = "Materia " + nota.getIdMateria();
+
+            // Buscar nombre de la materia
+            for (Materia materia : materias) {
+                if (materia.getId() == nota.getIdMateria()) {
+                    nombreMateria = materia.getNombre();
+                    break;
+                }
+            }
+
+            if (!notasPorMateria.containsKey(nombreMateria)) {
+                notasPorMateria.put(nombreMateria, new ArrayList<>());
+            }
+            notasPorMateria.get(nombreMateria).add(nota.getNota());
+        }
+
+        // Mostrar notas por materia
+        for (Map.Entry<String, ArrayList<Double>> entry : notasPorMateria.entrySet()) {
+            mensaje.append(entry.getKey()).append(":\n");
+
+            double suma = 0;
+            for (Double nota : entry.getValue()) {
+                mensaje.append("  • ").append(String.format("%.2f", nota)).append("\n");
+                suma += nota;
+            }
+
+            double promedio = suma / entry.getValue().size();
+            mensaje.append("  Promedio: ").append(String.format("%.2f", promedio)).append("\n\n");
+        }
+
+        // Mostrar promedio general
+        double promedioGeneral = 0;
+        int totalNotas = 0;
+        for (ArrayList<Double> notas : notasPorMateria.values()) {
+            for (Double nota : notas) {
+                promedioGeneral += nota;
+                totalNotas++;
+            }
+        }
+
+        if (totalNotas > 0) {
+            promedioGeneral /= totalNotas;
+            mensaje.append("🎯 PROMEDIO GENERAL: ").append(String.format("%.2f", promedioGeneral));
+        }
+
+        // Mostrar diálogo con las notas
+        TextArea textArea = new TextArea(mensaje.toString());
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        textArea.setPrefSize(500, 400);
+
+        ScrollPane scrollPane = new ScrollPane(textArea);
+        scrollPane.setFitToWidth(true);
+
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Notas del Estudiante");
+        dialog.setHeaderText("Notas de: " + estudianteSeleccionado.getNombre());
+        dialog.getDialogPane().setContent(scrollPane);
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+
+        Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+        stage.setAlwaysOnTop(true);
+
+        dialog.showAndWait();
+    }
+
+    @FXML
+    private void eliminarNota() {
+        // Obtener todas las notas
+        ArrayList<Nota> todasNotas = gestorNotas.obtenerNotas();
+
+        if (todasNotas.isEmpty()) {
+            mostrarAlerta("Información", "No hay notas registradas en el sistema.", Alert.AlertType.INFORMATION);
+            return;
+        }
+
+        // Crear diálogo para seleccionar nota
+        Dialog<Nota> dialog = new Dialog<>();
+        dialog.setTitle("Eliminar Nota");
+        dialog.setHeaderText("Seleccione la nota a eliminar:");
+
+        // Crear lista de notas
+        ListView<Nota> listView = new ListView<>();
+        ObservableList<Nota> listaNotas = FXCollections.observableArrayList(todasNotas);
+        listView.setItems(listaNotas);
+
+        // Formatear cómo se muestran las notas
+        listView.setCellFactory(param -> new ListCell<Nota>() {
+            @Override
+            protected void updateItem(Nota nota, boolean empty) {
+                super.updateItem(nota, empty);
+                if (empty || nota == null) {
+                    setText(null);
+                } else {
+                    // Buscar estudiante
+                    Estudiante estudiante = null;
+                    for (Estudiante e : gestorEstudiantes.getEstudiantes()) {
+                        if (e.getId() == nota.getIdEstudiante()) {  // CORRECCIÓN: Comparar int con int
+                            estudiante = e;
+                            break;
+                        }
+                    }
+
+                    // Buscar materia
+                    String nombreMateria = "Materia " + nota.getIdMateria();
+                    for (Materia m : gestorMaterias.getMaterias()) {
+                        if (m.getId() == nota.getIdMateria()) {
+                            nombreMateria = m.getNombre();
+                            break;
+                        }
+                    }
+
+                    String nombreEstudiante = estudiante != null ? estudiante.getNombre() : "ID: " + nota.getIdEstudiante();
+                    setText("ID Nota: " + nota.getId() + " | " + nombreEstudiante +
+                            " | " + nombreMateria + " | Nota: " + String.format("%.2f", nota.getNota()));
+                }
+            }
+        });
+
+        ScrollPane scrollPane = new ScrollPane(listView);
+        scrollPane.setPrefSize(600, 300);
+
+        dialog.getDialogPane().setContent(scrollPane);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        // Configurar resultado
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == ButtonType.OK) {
+                return listView.getSelectionModel().getSelectedItem();
+            }
+            return null;
+        });
+
+        // Mostrar diálogo y procesar resultado
+        dialog.showAndWait().ifPresent(notaSeleccionada -> {
+            if (notaSeleccionada != null) {
+                // Confirmar eliminación
+                Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+                confirmacion.setTitle("Confirmar Eliminación");
+                confirmacion.setHeaderText("¿Está seguro de eliminar esta nota?");
+
+                // Buscar información para el mensaje
+                Estudiante estudiante = null;
+                for (Estudiante e : gestorEstudiantes.getEstudiantes()) {
+                    if (e.getId() == notaSeleccionada.getIdEstudiante()) {  // CORRECCIÓN: Comparar int con int
+                        estudiante = e;
+                        break;
+                    }
+                }
+
+                String nombreMateria = "Materia " + notaSeleccionada.getIdMateria();
+                for (Materia m : gestorMaterias.getMaterias()) {
+                    if (m.getId() == notaSeleccionada.getIdMateria()) {
+                        nombreMateria = m.getNombre();
+                        break;
+                    }
+                }
+
+                String mensajeConfirmacion = "Nota a eliminar:\n\n" +
+                        "ID Nota: " + notaSeleccionada.getId() + "\n" +
+                        "Estudiante: " + (estudiante != null ? estudiante.getNombre() : "ID: " + notaSeleccionada.getIdEstudiante()) + "\n" +
+                        "Materia: " + nombreMateria + "\n" +
+                        "Nota: " + String.format("%.2f", notaSeleccionada.getNota());
+
+                confirmacion.setContentText(mensajeConfirmacion);
+
+                confirmacion.showAndWait().ifPresent(response -> {
+                    if (response == ButtonType.OK) {
+                        // Eliminar la nota
+                        if (gestorNotas.eliminarNota(notaSeleccionada.getId())) {
+                            mostrarAlerta("Éxito", "Nota eliminada correctamente.", Alert.AlertType.INFORMATION);
+                        } else {
+                            mostrarAlerta("Error", "No se pudo eliminar la nota.", Alert.AlertType.ERROR);
+                        }
+                    }
+                });
+            }
+        });
     }
 }
