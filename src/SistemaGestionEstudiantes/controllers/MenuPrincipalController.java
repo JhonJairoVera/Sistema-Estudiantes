@@ -24,12 +24,102 @@ public class MenuPrincipalController {
     @FXML private Button btnEstudiante;
     @FXML private Button btnExtra;
     @FXML private Button btnCerrar;
+    @FXML private Button btnAcercaDe; // Nuevo botón
 
     @FXML
     public void initialize() {
         System.out.println("MenuPrincipalController inicializado");
     }
 
+    // ==================== MÉTODO PARA "ACERCA DE" ====================
+    @FXML
+    private void mostrarAcercaDe() {
+        try {
+            System.out.println("=== ABRIENDO VENTANA 'ACERCA DE' ===");
+
+            // Cargar el archivo FXML de AcercaDe
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/AcercaDe.fxml"));
+            Parent root = loader.load();
+
+            // Crear nueva ventana
+            Stage acercaDeStage = new Stage();
+            acercaDeStage.setTitle("Acerca de SPES - Sistema de Gestión Estudiantil");
+            acercaDeStage.setScene(new Scene(root));
+            acercaDeStage.setResizable(false);
+
+            // Centrar en la pantalla
+            acercaDeStage.centerOnScreen();
+
+            // Mostrar ventana
+            acercaDeStage.show();
+
+            System.out.println("✓ Ventana 'Acerca de' abierta exitosamente");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error al cargar AcercaDe.fxml: " + e.getMessage());
+
+            // Mostrar mensaje de error
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("No se pudo cargar la ventana 'Acerca de'");
+            alert.setContentText("Verifica que el archivo AcercaDe.fxml exista en la carpeta views.\nError: " + e.getMessage());
+            alert.show();
+        } catch (NullPointerException e) {
+            System.err.println("Archivo AcercaDe.fxml no encontrado");
+
+            // Crear una ventana simple de emergencia
+            crearVentanaAcercaDeEmergencia();
+        }
+    }
+
+    /**
+     * Método de emergencia si no se encuentra el archivo FXML
+     */
+    private void crearVentanaAcercaDeEmergencia() {
+        Stage stage = new Stage();
+        stage.setTitle("Acerca de SPES");
+
+        VBox root = new VBox(20);
+        root.setStyle("-fx-padding: 30; -fx-background-color: #1D1D47; -fx-alignment: center;");
+
+        Label titulo = new Label("Seguimiento y Progreso Mediante la Evaluación Sistemática");
+        titulo.setStyle("-fx-text-fill: #73FFFF; -fx-font-size: 20px; -fx-font-weight: bold; -fx-text-alignment: center;");
+
+        Label descripcion = new Label("SPES: Sistema de Gestión Estudiantil");
+        descripcion.setStyle("-fx-text-fill: white; -fx-font-size: 14px;");
+
+        VBox equipoBox = new VBox(10);
+        equipoBox.setStyle("-fx-padding: 20; -fx-background-color: rgba(0,0,0,0.3); -fx-background-radius: 10;");
+
+        Label equipoTitle = new Label("Equipo de Desarrollo:");
+        equipoTitle.setStyle("-fx-text-fill: #73FFFF; -fx-font-weight: bold;");
+
+        Label po = new Label("• Jhon Jairo Vera Acevedo - Product Owner");
+        po.setStyle("-fx-text-fill: white;");
+
+        Label sm = new Label("• Nicolás Steven Pineda Rodríguez - Scrum Master");
+        sm.setStyle("-fx-text-fill: white;");
+
+        Label dev = new Label("• Deyner Alberto Contreras Sandoval - Developer");
+        dev.setStyle("-fx-text-fill: white;");
+
+        Label version = new Label("Versión 2.0 © 2024");
+        version.setStyle("-fx-text-fill: #888888; -fx-font-size: 12px;");
+
+        Button btnCerrar = new Button("Cerrar");
+        btnCerrar.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white;");
+        btnCerrar.setOnAction(e -> stage.close());
+
+        equipoBox.getChildren().addAll(equipoTitle, po, sm, dev);
+        root.getChildren().addAll(titulo, descripcion, equipoBox, version, btnCerrar);
+
+        Scene scene = new Scene(root, 500, 400);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    // ==================== MÉTODOS EXISTENTES ====================
     @FXML
     private void abrirMenuProfesor() {
         System.out.println("Intentando abrir menú profesor...");
@@ -85,77 +175,22 @@ public class MenuPrincipalController {
         System.out.println("Abriendo consulta de estudiante...");
 
         try {
-            // Esto debe cargar el NUEVO archivo
+            // Cargar la vista de consulta de estudiante
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/ConsultaEstudianteView.fxml"));
             Parent root = loader.load();
 
             Stage stage = new Stage();
             stage.setTitle("Consulta de Notas - Estudiante");
-            stage.setScene(new Scene(root, 700, 500));
+            stage.setScene(new Scene(root));
+            stage.setResizable(false);
             stage.show();
 
-            System.out.println(" Ventana abierta correctamente");
+            System.out.println("✓ Ventana de consulta de estudiante abierta correctamente");
 
         } catch (Exception e) {
-            System.err.println(" Error: " + e.getMessage());
+            System.err.println("✗ Error al abrir consulta de estudiante: " + e.getMessage());
             e.printStackTrace();
-        }
-    }
-
-    private void crearVentanaConsultaSimple() {
-        try {
-            Stage stage = new Stage();
-            stage.setTitle("Consulta de Estudiante");
-
-            VBox root = new VBox(20);
-            root.setStyle("-fx-padding: 30; -fx-background-color: #1D1D47;");
-
-            Label titulo = new Label(" Consulta de Notas");
-            titulo.setStyle("-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;");
-
-            HBox hbox = new HBox(10);
-            hbox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-
-            Label lbl = new Label("Número de Identificación:");
-            lbl.setStyle("-fx-text-fill: white;");
-
-            TextField txtId = new TextField();
-            txtId.setPromptText("Ingrese su CC");
-            txtId.setPrefWidth(200);
-
-            Button btnBuscar = new Button("Buscar");
-            btnBuscar.setStyle("-fx-background-color: #73FFFF; -fx-text-fill: black;");
-
-            TextArea areaResultado = new TextArea();
-            areaResultado.setPrefHeight(300);
-            areaResultado.setEditable(false);
-            areaResultado.setWrapText(true);
-
-            btnBuscar.setOnAction(e -> {
-                String id = txtId.getText().trim();
-                if (id.isEmpty()) {
-                    areaResultado.setText("Por favor ingrese un número de identificación");
-                    return;
-                }
-
-                areaResultado.setText("Consulta de notas para estudiante: " + id + "\n\n" +
-                        "Esta funcionalidad está en desarrollo.\n" +
-                        "Por ahora, puedes usar la versión de consola.");
-            });
-
-            hbox.getChildren().addAll(lbl, txtId, btnBuscar);
-
-            Button btnCerrar = new Button("Cerrar");
-            btnCerrar.setStyle("-fx-background-color: red; -fx-text-fill: white;");
-            btnCerrar.setOnAction(e -> stage.close());
-
-            root.getChildren().addAll(titulo, hbox, areaResultado, btnCerrar);
-
-            stage.setScene(new Scene(root, 600, 500));
-            stage.show();
-
-        } catch (Exception e) {
-            System.err.println("Error al crear ventana simple: " + e.getMessage());
+            mostrarError("No se pudo abrir la ventana de consulta de estudiante.\nError: " + e.getMessage());
         }
     }
 
