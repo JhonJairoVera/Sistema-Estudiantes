@@ -2,42 +2,105 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
 
-<VBox spacing="15" style="-fx-padding: 20; -fx-background-color: #1D1D47;"
+<VBox spacing="20" style="-fx-padding: 20; -fx-background-color: #1D1D47;"
       xmlns="http://javafx.com/javafx/17.0.12"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="SistemaGestionEstudiantes.controllers.ConsultaEstudianteController">
 
     <!-- Título -->
-    <Label text="📚 Consulta de Notas"
-           style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" />
+    <Label text="📚 CONSULTA DE NOTAS"
+           style="-fx-text-fill: #73FFFF; -fx-font-size: 28px; -fx-font-weight: bold;" />
 
     <!-- Campo de búsqueda -->
-    <HBox spacing="10" alignment="CENTER_LEFT">
-        <Label text="Número de Identificación:"
-               style="-fx-text-fill: white;" />
-        <TextField fx:id="txtIdentificacion"
-                   promptText="Ej: 123456789"
-                   style="-fx-pref-width: 250;" />
-        <Button onAction="#buscarEstudiante"
-                text="Buscar"
-                style="-fx-background-color: #73FFFF; -fx-text-fill: black;" />
-    </HBox>
+    <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: #000000; -fx-background-radius: 10;">
+        <Label text="INGRESE SU IDENTIFICACIÓN"
+               style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" />
 
-    <!-- Área de resultados -->
-    <TextArea fx:id="areaResultado"
-              style="-fx-pref-height: 350; -fx-font-family: 'Arial';"
-              editable="false"
-              wrapText="true" />
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <TextField fx:id="txtIdentificacion"
+                       promptText="Ej: 123456789"
+                       style="-fx-pref-width: 300; -fx-pref-height: 35; -fx-font-size: 14px; -fx-background-radius: 5; -fx-text-fill: black;" />
+            <Button onAction="#buscarEstudiante"
+                    text="🔍 BUSCAR"
+                    style="-fx-background-color: #1a4baf; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-height: 35; -fx-pref-width: 120;" />
+        </HBox>
+    </VBox>
+
+    <!-- Información del estudiante -->
+    <VBox fx:id="infoEstudiante" spacing="10" style="-fx-padding: 15; -fx-background-color: #000000; -fx-background-radius: 10; -fx-opacity: 0;" visible="false">
+        <Label text="📋 INFORMACIÓN DEL ESTUDIANTE"
+               style="-fx-text-fill: #73FFFF; -fx-font-size: 18px; -fx-font-weight: bold;" />
+
+        <GridPane hgap="20" vgap="10">
+            <Label text="Nombre:" style="-fx-text-fill: white;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <Label fx:id="lblNombre" style="-fx-text-fill: white; -fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+            <Label text="Identificación:" style="-fx-text-fill: white;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+            <Label fx:id="lblIdentificacion" style="-fx-text-fill: white; -fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+            <Label text="ID:" style="-fx-text-fill: white;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <Label fx:id="lblId" style="-fx-text-fill: white; -fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        </GridPane>
+    </VBox>
+
+    <!-- Tabla de notas - ESTILOS CORREGIDOS -->
+    <VBox fx:id="contenedorNotas" spacing="10" style="-fx-padding: 15; -fx-background-color: #000000; -fx-background-radius: 10; -fx-opacity: 0;" visible="false">
+        <Label text="📊 NOTAS REGISTRADAS"
+               style="-fx-text-fill: #73FFFF; -fx-font-size: 18px; -fx-font-weight: bold;" />
+
+        <!-- TABLA CON FONDO GRIS OSCURO Y TEXTO BLANCO -->
+        <TableView fx:id="tablaNotas" prefHeight="250"
+                   style="-fx-background-color: #2d2d2d;
+                          -fx-control-inner-background: #2d2d2d;
+                          -fx-table-cell-border-color: transparent;
+                          -fx-text-fill: white;
+                          -fx-font-size: 13px;">
+
+            <columns>
+                <!-- COLUMNA MATERIA -->
+                <TableColumn fx:id="colMateria" text="MATERIA" prefWidth="200" />
+
+                <!-- COLUMNA NOTAS -->
+                <TableColumn fx:id="colNotas" text="NOTAS" prefWidth="250" />
+
+                <!-- COLUMNA PROMEDIO -->
+                <TableColumn fx:id="colPromedio" text="PROMEDIO" prefWidth="100" />
+
+                <!-- COLUMNA ESTADO -->
+                <TableColumn fx:id="colEstado" text="ESTADO" prefWidth="100" />
+            </columns>
+        </TableView>
+
+        <!-- Promedio general -->
+        <HBox spacing="20" alignment="CENTER_RIGHT">
+            <Label text="PROMEDIO GENERAL:"
+                   style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"/>
+            <Label fx:id="lblPromedioGeneral"
+                   style="-fx-text-fill: #73FFFF; -fx-font-weight: bold; -fx-font-size: 18px;"/>
+            <Label fx:id="lblEstadoGeneral"
+                   style="-fx-font-weight: bold; -fx-font-size: 16px;" />
+        </HBox>
+    </VBox>
+
+    <!-- Mensaje cuando no hay notas -->
+    <VBox fx:id="mensajeSinNotas" spacing="10" alignment="CENTER" style="-fx-padding: 30; -fx-background-color: #000000; -fx-background-radius: 10; -fx-opacity: 0;" visible="false">
+        <Label text="📭 NO HAY NOTAS REGISTRADAS"
+               style="-fx-text-fill: #73FFFF; -fx-font-size: 20px; -fx-font-weight: bold;" />
+        <Label text="Este estudiante no tiene notas registradas en el sistema."
+               style="-fx-text-fill: white; -fx-font-size: 14px;" />
+    </VBox>
 
     <!-- Botones -->
-    <HBox spacing="15" alignment="CENTER">
+    <HBox spacing="30" alignment="CENTER" style="-fx-padding: 10;">
         <Button onAction="#nuevaBusqueda"
-                text="Nueva Búsqueda"
-                style="-fx-background-color: #4CAF50; -fx-text-fill: white;" />
+                text="🔄 NUEVA BÚSQUEDA"
+                style="-fx-background-color: #1a4baf; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-height: 40; -fx-pref-width: 180;" />
         <Button onAction="#cerrarVentana"
-                text="Cerrar"
-                style="-fx-background-color: #F44336; -fx-text-fill: white;" />
+                text="❌ CERRAR"
+                style="-fx-background-color: #FF5252; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-height: 40; -fx-pref-width: 120;" />
     </HBox>
 
 </VBox>

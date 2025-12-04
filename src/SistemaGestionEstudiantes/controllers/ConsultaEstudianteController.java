@@ -9,10 +9,17 @@ import SistemaGestionEstudiantes.database.Nota;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Callback;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,23 +28,115 @@ import java.util.Map;
 
 public class ConsultaEstudianteController {
 
-    @FXML
-    private TextField txtIdentificacion;
-
-    @FXML
-    private TextArea areaResultado;
+    @FXML private TextField txtIdentificacion;
+    @FXML private VBox infoEstudiante;
+    @FXML private Label lblNombre;
+    @FXML private Label lblIdentificacion;
+    @FXML private Label lblId;
+    @FXML private VBox contenedorNotas;
+    @FXML private TableView<NotaMateria> tablaNotas;
+    @FXML private TableColumn<NotaMateria, String> colMateria;
+    @FXML private TableColumn<NotaMateria, String> colNotas;
+    @FXML private TableColumn<NotaMateria, String> colPromedio;
+    @FXML private TableColumn<NotaMateria, String> colEstado;
+    @FXML private Label lblPromedioGeneral;
+    @FXML private Label lblEstadoGeneral;
+    @FXML private VBox mensajeSinNotas;
 
     private GestorEstudiante gestorEstudiantes = new GestorEstudiante();
     private GestorMaterias gestorMaterias = new GestorMaterias();
     private GestorNotas gestorNotas = new GestorNotas();
+    private ObservableList<NotaMateria> listaNotas = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
-        System.out.println("Controlador de consulta inicializado");
-        areaResultado.setText("Sistema de consulta de notas\n\n" +
-                "Ingrese su número de identificación y presione Buscar");
+        System.out.println("✅ Controlador de consulta inicializado");
+
+        // Configurar columnas
+        colMateria.setCellValueFactory(new PropertyValueFactory<>("materia"));
+        colNotas.setCellValueFactory(new PropertyValueFactory<>("notas"));
+        colPromedio.setCellValueFactory(new PropertyValueFactory<>("promedio"));
+        colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
+
+        configurarEstiloCeldas();
+        ocultarTodasLasSecciones();
+        txtIdentificacion.requestFocus();
     }
 
+    private void configurarEstiloCeldas() {
+        // Configurar el cellFactory para cada columna
+        colMateria.setCellFactory(column -> new TableCell<NotaMateria, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    setStyle("-fx-text-fill: white; -fx-font-size: 13px; -fx-alignment: CENTER_LEFT; -fx-padding: 5;");
+                }
+            }
+        });
+
+        colNotas.setCellFactory(column -> new TableCell<NotaMateria, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    setStyle("-fx-text-fill: white; -fx-font-size: 13px; -fx-alignment: CENTER; -fx-padding: 5;");
+                }
+            }
+        });
+
+        colPromedio.setCellFactory(column -> new TableCell<NotaMateria, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    // Color condicional basado en el valor
+                    try {
+                        double valor = Double.parseDouble(item);
+                        if (valor >= 3.5) {
+                            setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold; -fx-font-size: 13px; -fx-alignment: CENTER; -fx-padding: 5;");
+                        } else if (valor >= 3.0) {
+                            setStyle("-fx-text-fill: #FFC107; -fx-font-weight: bold; -fx-font-size: 13px; -fx-alignment: CENTER; -fx-padding: 5;");
+                        } else {
+                            setStyle("-fx-text-fill: #F44336; -fx-font-weight: bold; -fx-font-size: 13px; -fx-alignment: CENTER; -fx-padding: 5;");
+                        }
+                    } catch (NumberFormatException e) {
+                        setStyle("-fx-text-fill: white; -fx-font-size: 13px; -fx-alignment: CENTER; -fx-padding: 5;");
+                    }
+                }
+            }
+        });
+
+        colEstado.setCellFactory(column -> new TableCell<NotaMateria, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    if (item.contains("APROBADO") || item.contains("✓")) {
+                        setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold; -fx-font-size: 13px; -fx-alignment: CENTER; -fx-padding: 5;");
+                    } else {
+                        setStyle("-fx-text-fill: #F44336; -fx-font-weight: bold; -fx-font-size: 13px; -fx-alignment: CENTER; -fx-padding: 5;");
+                    }
+                }
+            }
+        });
+    }
     @FXML
     private void buscarEstudiante() {
         String identificacion = txtIdentificacion.getText().trim();
@@ -47,15 +146,11 @@ public class ConsultaEstudianteController {
             return;
         }
 
-        // Buscar estudiante por identificación
-        Estudiante estudiante = null;
-        List<Estudiante> estudiantes = gestorEstudiantes.getEstudiantes();
-
         System.out.println("Buscando estudiante con identificación: " + identificacion);
-        System.out.println("Total estudiantes en sistema: " + estudiantes.size());
 
-        for (Estudiante e : estudiantes) {
-            System.out.println("Estudiante ID: " + e.getId() + ", Identificación: " + e.getIdentificacion());
+        // Buscar estudiante
+        Estudiante estudiante = null;
+        for (Estudiante e : gestorEstudiantes.getEstudiantes()) {
             if (e.getIdentificacion().equals(identificacion)) {
                 estudiante = e;
                 break;
@@ -63,122 +158,132 @@ public class ConsultaEstudianteController {
         }
 
         if (estudiante == null) {
-            mostrarAlerta("Error", "No se encontró un estudiante con la identificación: " + identificacion,
-                    Alert.AlertType.ERROR);
-            areaResultado.setText(" No se encontró ningún estudiante con la identificación:\n" + identificacion);
+            mostrarAlerta("Error", "No se encontró un estudiante con esa identificación", Alert.AlertType.ERROR);
+            ocultarTodasLasSecciones();
             return;
         }
 
-        // Obtener todas las notas del sistema
-        ArrayList<Nota> todasNotas = gestorNotas.obtenerNotas();
-        System.out.println("Total notas en sistema: " + todasNotas.size());
+        // Mostrar información del estudiante
+        mostrarInformacionEstudiante(estudiante);
 
-        // Filtrar notas del estudiante
+        // Obtener notas del estudiante
+        ArrayList<Nota> todasNotas = gestorNotas.obtenerNotas();
         ArrayList<Nota> notasEstudiante = new ArrayList<>();
+
         for (Nota nota : todasNotas) {
             if (nota.getIdEstudiante() == estudiante.getId()) {
                 notasEstudiante.add(nota);
             }
         }
 
-        System.out.println("Notas encontradas para el estudiante: " + notasEstudiante.size());
-
         if (notasEstudiante.isEmpty()) {
-            String mensajeSinNotas = "=== CONSULTA DE NOTAS ===\n\n" +
-                    "👤 ESTUDIANTE:\n" +
-                    "Identificación: " + estudiante.getIdentificacion() + "\n" +
-                    "Nombre: " + estudiante.getNombre() + "\n" +
-                    "ID Interno: EST" + String.format("%03d", estudiante.getId()) + "\n\n" +
-                    "NOTAS: \n" +
-                    "El estudiante no tiene notas registradas.\n";
-            areaResultado.setText(mensajeSinNotas);
-            return;
+            mostrarMensajeSinNotas();
+        } else {
+            mostrarNotasEnTabla(estudiante, notasEstudiante);
         }
-
-        // Construir resultado con datos reales
-        String resultado = construirResultado(estudiante, notasEstudiante);
-        areaResultado.setText(resultado);
     }
 
-    private String construirResultado(Estudiante estudiante, ArrayList<Nota> notasEstudiante) {
-        StringBuilder resultado = new StringBuilder();
+    private void mostrarInformacionEstudiante(Estudiante estudiante) {
+        infoEstudiante.setVisible(true);
+        infoEstudiante.setOpacity(1);
+        lblNombre.setText(estudiante.getNombre());
+        lblIdentificacion.setText(estudiante.getIdentificacion());
+        lblId.setText(String.valueOf(estudiante.getId()));
+    }
 
-        // Encabezado
-        resultado.append("=== CONSULTA DE NOTAS ===\n\n");
-        resultado.append("👤 ESTUDIANTE:\n");
-        resultado.append("Identificación: ").append(estudiante.getIdentificacion()).append("\n");
-        resultado.append("Nombre: ").append(estudiante.getNombre()).append("\n");
-        resultado.append("ID: ").append(estudiante.getId()).append("\n\n");
+    private void mostrarNotasEnTabla(Estudiante estudiante, ArrayList<Nota> notasEstudiante) {
+        mensajeSinNotas.setVisible(false);
+        contenedorNotas.setVisible(true);
+        contenedorNotas.setOpacity(1);
+        listaNotas.clear();
 
-        resultado.append("NOTAS POR MATERIA:\n\n");
-
-        // Obtener materias para mostrar nombres
         List<Materia> materias = gestorMaterias.getMaterias();
-
-        // Agrupar notas por materia
         Map<String, ArrayList<Double>> notasPorMateria = new HashMap<>();
 
+        // Agrupar notas por materia
         for (Nota nota : notasEstudiante) {
             String nombreMateria = "Materia " + nota.getIdMateria();
-
-            // Buscar nombre de la materia
             for (Materia materia : materias) {
                 if (materia.getId() == nota.getIdMateria()) {
                     nombreMateria = materia.getNombre();
                     break;
                 }
             }
-
             if (!notasPorMateria.containsKey(nombreMateria)) {
                 notasPorMateria.put(nombreMateria, new ArrayList<>());
             }
             notasPorMateria.get(nombreMateria).add(nota.getNota());
         }
 
-        // Mostrar notas por materia
-        for (Map.Entry<String, ArrayList<Double>> entry : notasPorMateria.entrySet()) {
-            resultado.append(entry.getKey()).append(":\n");
-
-            int contador = 1;
-            double suma = 0;
-            for (Double nota : entry.getValue()) {
-                resultado.append("  • Nota ").append(contador).append(": ")
-                        .append(String.format("%.2f", nota)).append("\n");
-                suma += nota;
-                contador++;
-            }
-
-            double promedio = suma / entry.getValue().size();
-            resultado.append("  Promedio: ").append(String.format("%.2f", promedio)).append("\n\n");
-        }
-
-        // Calcular promedio general
-        double promedioGeneral = 0;
+        // Calcular promedios y agregar a la tabla
+        double totalGeneral = 0;
         int totalNotas = 0;
-        for (ArrayList<Double> notas : notasPorMateria.values()) {
-            for (Double nota : notas) {
-                promedioGeneral += nota;
+
+        for (Map.Entry<String, ArrayList<Double>> entry : notasPorMateria.entrySet()) {
+            StringBuilder notasTexto = new StringBuilder();
+            double sumaMateria = 0;
+
+            for (int i = 0; i < entry.getValue().size(); i++) {
+                Double nota = entry.getValue().get(i);
+                notasTexto.append(String.format("%.1f", nota));
+                if (i < entry.getValue().size() - 1) notasTexto.append(" | ");
+                sumaMateria += nota;
+                totalGeneral += nota;
                 totalNotas++;
             }
+
+            double promedioMateria = sumaMateria / entry.getValue().size();
+            String estado = (promedioMateria >= 3.0) ? "APROBADO ✓" : "REPROBADO ✗";
+
+            listaNotas.add(new NotaMateria(
+                    entry.getKey(),
+                    notasTexto.toString(),
+                    String.format("%.2f", promedioMateria),
+                    estado
+            ));
         }
 
+        tablaNotas.setItems(listaNotas);
+
+        // Calcular promedio general
         if (totalNotas > 0) {
-            promedioGeneral /= totalNotas;
-            resultado.append("🎯 PROMEDIO GENERAL: ").append(String.format("%.2f", promedioGeneral)).append("\n\n");
+            double promedioGeneral = totalGeneral / totalNotas;
+            lblPromedioGeneral.setText(String.format("%.2f", promedioGeneral));
 
-            // Estado (aprobado/reprobado)
-            String estado = (promedioGeneral >= 3.0) ? "APROBADO ✓" : "REPROBADO ✗";
-            resultado.append("Estado: ").append(estado);
+            if (promedioGeneral >= 3.5) {
+                lblPromedioGeneral.setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold; -fx-font-size: 18px;");
+            } else if (promedioGeneral >= 3.0) {
+                lblPromedioGeneral.setStyle("-fx-text-fill: #FFC107; -fx-font-weight: bold; -fx-font-size: 18px;");
+            } else {
+                lblPromedioGeneral.setStyle("-fx-text-fill: #F44336; -fx-font-weight: bold; -fx-font-size: 18px;");
+            }
+
+            if (promedioGeneral >= 3.0) {
+                lblEstadoGeneral.setText("APROBADO ✓");
+                lblEstadoGeneral.setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold; -fx-font-size: 16px;");
+            } else {
+                lblEstadoGeneral.setText("REPROBADO ✗");
+                lblEstadoGeneral.setStyle("-fx-text-fill: #F44336; -fx-font-weight: bold; -fx-font-size: 16px;");
+            }
         }
+    }
 
-        return resultado.toString();
+    private void mostrarMensajeSinNotas() {
+        contenedorNotas.setVisible(false);
+        mensajeSinNotas.setVisible(true);
+        mensajeSinNotas.setOpacity(1);
+    }
+
+    private void ocultarTodasLasSecciones() {
+        infoEstudiante.setVisible(false);
+        contenedorNotas.setVisible(false);
+        mensajeSinNotas.setVisible(false);
     }
 
     @FXML
     private void nuevaBusqueda() {
         txtIdentificacion.clear();
-        areaResultado.clear();
-        areaResultado.setText("Ingrese un nuevo número de identificación...");
+        ocultarTodasLasSecciones();
         txtIdentificacion.requestFocus();
     }
 

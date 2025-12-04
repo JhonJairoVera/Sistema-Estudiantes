@@ -1,52 +1,47 @@
 package SistemaGestionEstudiantes.controllers;
 
+import SistemaGestionEstudiantes.Estudiante;
+import SistemaGestionEstudiantes.Materia;
+import SistemaGestionEstudiantes.database.GestorEstudiante;
+import SistemaGestionEstudiantes.GestorMaterias;
 import SistemaGestionEstudiantes.GestorNotas;
 import SistemaGestionEstudiantes.database.Nota;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import javafx.event.ActionEvent;
-import javafx.stage.Window;
+import SistemaGestionEstudiantes.GestorContrasena;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.stage.Stage;
-import javafx.beans.property.SimpleStringProperty;
-
-import SistemaGestionEstudiantes.database.GestorEstudiante;
-import SistemaGestionEstudiantes.GestorMaterias;
-import SistemaGestionEstudiantes.GestorContrasena;
-import SistemaGestionEstudiantes.Estudiante;
-import SistemaGestionEstudiantes.Materia;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MenuProfesorController {
 
-    // Estudiantes
-    @FXML private TableView<Estudiante> tablaEstudiantes;
-    @FXML private TableColumn<Estudiante, String> colId;
-    @FXML private TableColumn<Estudiante, String> colNombre;
-    @FXML private TableColumn<Estudiante, String> colIdentificacion;
     @FXML private TextField txtIdentificacion;
     @FXML private TextField txtNombre;
     @FXML private TextField txtBuscar;
+    @FXML private TableView<Estudiante> tablaEstudiantes;
+    @FXML private TableColumn<Estudiante, Integer> colId;
+    @FXML private TableColumn<Estudiante, String> colIdentificacion;
+    @FXML private TableColumn<Estudiante, String> colNombre;
 
-    // Notas
     @FXML private ComboBox<Estudiante> comboEstudiantes;
-    @FXML private ComboBox<String> comboMaterias;
+    @FXML private ComboBox<Materia> comboMaterias;
     @FXML private TextField txtNota;
 
-    // Materias
     @FXML private TextField txtNuevaMateria;
-    @FXML private ListView<String> listaMaterias;
+    @FXML private ListView<Materia> listaMaterias;
 
-    // Contraseña
     @FXML private PasswordField txtNuevaContrasena;
 
     private GestorEstudiante gestorEstudiantes = new GestorEstudiante();
@@ -55,50 +50,20 @@ public class MenuProfesorController {
 
     @FXML
     public void initialize() {
-        configurarTabla();
-        cargarDatos();
+        System.out.println("MenuProfesorController inicializado");
+
+        // Configurar tabla de estudiantes
+        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colIdentificacion.setCellValueFactory(new PropertyValueFactory<>("identificacion"));
+        colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+
+        cargarEstudiantesEnTabla();
+        cargarEstudiantesEnComboBox();
+        cargarMateriasEnComboBox();
+        cargarMateriasEnListView();
     }
 
-    private void configurarTabla() {
-        colId.setCellValueFactory(cellData ->
-                cellData.getValue().idProperty().asString());
-
-        colIdentificacion.setCellValueFactory(cellData ->
-                cellData.getValue().identificacionProperty());
-
-        colNombre.setCellValueFactory(cellData ->
-                cellData.getValue().nombreProperty());
-    }
-
-    private void cargarDatos() {
-        // Cargar estudiantes en tabla
-        List<Estudiante> estudiantes = gestorEstudiantes.getEstudiantes();
-        ObservableList<Estudiante> listaEst = FXCollections.observableArrayList(estudiantes);
-        tablaEstudiantes.setItems(listaEst);
-
-        // Cargar estudiantes en ComboBox
-        comboEstudiantes.setItems(listaEst);
-        comboEstudiantes.setCellFactory(param -> new ListCell<Estudiante>() {
-            @Override
-            protected void updateItem(Estudiante item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.getNombre() + " (ID: " + item.getId() + ")");
-                }
-            }
-        });
-
-        // Cargar materias
-        List<Materia> materias = gestorMaterias.getMaterias();
-        ObservableList<String> nombresMaterias = FXCollections.observableArrayList();
-        for (Materia m : materias) {
-            nombresMaterias.add(m.getNombre());
-        }
-        comboMaterias.setItems(nombresMaterias);
-        listaMaterias.setItems(nombresMaterias);
-    }
+    // ================ MÉTODOS PARA ESTUDIANTES ================
 
     @FXML
     private void agregarEstudiante() {
@@ -106,40 +71,51 @@ public class MenuProfesorController {
         String nombre = txtNombre.getText().trim();
 
         if (identificacion.isEmpty() || nombre.isEmpty()) {
-            mostrarAlerta("Error", "Complete todos los campos", Alert.AlertType.WARNING);
+            mostrarAlerta("Error", "Complete todos los campos", Alert.AlertType.ERROR);
             return;
         }
 
-        String idGenerado = gestorEstudiantes.agregarEstudiante(identificacion, nombre);
+        // Verificar si ya existe estudiante con esa identificación
+        for (Estudiante e : gestorEstudiantes.getEstudiantes()) {
+            if (e.getIdentificacion().equals(identificacion)) {
+                mostrarAlerta("Error", "Ya existe un estudiante con esa identificación", Alert.AlertType.ERROR);
+                return;
+            }
+        }
 
-        if (idGenerado != null) {
-            mostrarAlerta("Éxito", "Estudiante agregado con ID: " + idGenerado, Alert.AlertType.INFORMATION);
-            cargarDatos();
-            limpiarCamposEstudiante();
+        // Agregar nuevo estudiante usando el método de GestorEstudiante
+        String resultado = gestorEstudiantes.agregarEstudiante(identificacion, nombre);
+
+        if (resultado != null) {
+            mostrarAlerta("Éxito", "Estudiante agregado correctamente con ID: " + resultado, Alert.AlertType.INFORMATION);
+            txtIdentificacion.clear();
+            txtNombre.clear();
+            cargarEstudiantesEnTabla();
+            cargarEstudiantesEnComboBox();
         } else {
-            mostrarAlerta("Error", "Error al agregar estudiante", Alert.AlertType.ERROR);
+            mostrarAlerta("Error", "No se pudo agregar el estudiante", Alert.AlertType.ERROR);
         }
     }
 
     @FXML
     private void buscarEstudiante() {
-        String texto = txtBuscar.getText().trim().toLowerCase();
+        String busqueda = txtBuscar.getText().trim().toLowerCase();
 
-        if (texto.isEmpty()) {
-            cargarDatos();
+        if (busqueda.isEmpty()) {
+            cargarEstudiantesEnTabla();
             return;
         }
 
-        ObservableList<Estudiante> filtrados = FXCollections.observableArrayList();
+        ObservableList<Estudiante> estudiantesFiltrados = FXCollections.observableArrayList();
+
         for (Estudiante e : gestorEstudiantes.getEstudiantes()) {
-            if (e.getNombre().toLowerCase().contains(texto) ||
-                    e.getIdentificacion().toLowerCase().contains(texto) ||
-                    String.valueOf(e.getId()).contains(texto)) {
-                filtrados.add(e);
+            if (e.getNombre().toLowerCase().contains(busqueda) ||
+                    e.getIdentificacion().toLowerCase().contains(busqueda)) {
+                estudiantesFiltrados.add(e);
             }
         }
 
-        tablaEstudiantes.setItems(filtrados);
+        tablaEstudiantes.setItems(estudiantesFiltrados);
     }
 
     @FXML
@@ -154,192 +130,22 @@ public class MenuProfesorController {
         Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
         confirmacion.setTitle("Confirmar eliminación");
         confirmacion.setHeaderText("¿Eliminar estudiante?");
-        confirmacion.setContentText("¿Está seguro de eliminar a " + seleccionado.getNombre() + "?");
+        confirmacion.setContentText("Se eliminará: " + seleccionado.getNombre());
 
         confirmacion.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                if (gestorEstudiantes.eliminarEstudiante(String.valueOf(seleccionado.getId()))) {
+                // Convertir int id a String para el método eliminarEstudiante
+                boolean eliminado = gestorEstudiantes.eliminarEstudiante(String.valueOf(seleccionado.getId()));
+
+                if (eliminado) {
                     mostrarAlerta("Éxito", "Estudiante eliminado", Alert.AlertType.INFORMATION);
-                    cargarDatos();
+                    cargarEstudiantesEnTabla();
+                    cargarEstudiantesEnComboBox();
                 } else {
                     mostrarAlerta("Error", "No se pudo eliminar el estudiante", Alert.AlertType.ERROR);
                 }
             }
         });
-    }
-
-    @FXML
-    private void agregarNota() {
-        Estudiante estudiante = comboEstudiantes.getValue();
-        String materia = comboMaterias.getValue();
-        String notaTexto = txtNota.getText().trim();
-
-        if (estudiante == null || materia == null || notaTexto.isEmpty()) {
-            mostrarAlerta("Error", "Complete todos los campos", Alert.AlertType.WARNING);
-            return;
-        }
-
-        try {
-            double nota = Double.parseDouble(notaTexto);
-
-            if (nota < 0 || nota > 5) {
-                mostrarAlerta("Error", "La nota debe estar entre 0 y 5", Alert.AlertType.ERROR);
-                return;
-            }
-
-            if (gestorEstudiantes.agregarNota(
-                    String.valueOf(estudiante.getId()), materia, nota)) {
-                mostrarAlerta("Éxito", "Nota agregada correctamente", Alert.AlertType.INFORMATION);
-                txtNota.clear();
-            } else {
-                mostrarAlerta("Error", "Error al agregar nota", Alert.AlertType.ERROR);
-            }
-        } catch (NumberFormatException e) {
-            mostrarAlerta("Error", "Ingrese un número válido", Alert.AlertType.ERROR);
-        }
-    }
-
-    @FXML
-    private void agregarMateria() {
-        String nuevaMateria = txtNuevaMateria.getText().trim();
-
-        if (nuevaMateria.isEmpty()) {
-            mostrarAlerta("Error", "Ingrese el nombre de la materia", Alert.AlertType.WARNING);
-            return;
-        }
-
-        if (gestorMaterias.agregarMateria(nuevaMateria)) {
-            mostrarAlerta("Éxito", "Materia agregada", Alert.AlertType.INFORMATION);
-            txtNuevaMateria.clear();
-            cargarDatos();
-        } else {
-            mostrarAlerta("Error", "La materia ya existe", Alert.AlertType.ERROR);
-        }
-    }
-
-    @FXML
-    private void eliminarMateria() {
-        String materiaSeleccionada = listaMaterias.getSelectionModel().getSelectedItem();
-
-        if (materiaSeleccionada == null) {
-            mostrarAlerta("Error", "Seleccione una materia", Alert.AlertType.WARNING);
-            return;
-        }
-
-        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmacion.setTitle("Confirmar eliminación");
-        confirmacion.setHeaderText("¿Eliminar materia?");
-        confirmacion.setContentText("¿Está seguro de eliminar " + materiaSeleccionada + "?");
-
-        confirmacion.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                List<Materia> materias = gestorMaterias.getMaterias();
-                int idMateria = -1;
-                for (Materia m : materias) {
-                    if (m.getNombre().equals(materiaSeleccionada)) {
-                        idMateria = m.getId();
-                        break;
-                    }
-                }
-
-                if (idMateria != -1 && gestorMaterias.eliminarMateria(idMateria)) {
-                    mostrarAlerta("Éxito", "Materia eliminada", Alert.AlertType.INFORMATION);
-                    cargarDatos();
-                } else {
-                    mostrarAlerta("Error", "No se pudo eliminar la materia", Alert.AlertType.ERROR);
-                }
-            }
-        });
-    }
-
-    @FXML
-    private void cambiarContrasena() {
-        String nuevaContrasena = txtNuevaContrasena.getText().trim();
-
-        if (nuevaContrasena.length() != 4 || !nuevaContrasena.matches("\\d{4}")) {
-            mostrarAlerta("Error", "La contraseña debe tener 4 dígitos numéricos", Alert.AlertType.ERROR);
-            return;
-        }
-
-        GestorContrasena.cambiarContraseña(nuevaContrasena);
-        mostrarAlerta("Éxito", "Contraseña cambiada correctamente", Alert.AlertType.INFORMATION);
-        txtNuevaContrasena.clear();
-    }
-
-    @FXML
-    private void volverAlMenuPrincipal(ActionEvent event) {
-        System.out.println("Volviendo al menú principal...");
-
-        try {
-            if (event != null && event.getSource() instanceof javafx.scene.Node) {
-                Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
-                stage.close();
-            }
-            else if (tablaEstudiantes != null) {
-                Stage stage = (Stage) tablaEstudiantes.getScene().getWindow();
-                stage.close();
-            }
-
-            abrirVentanaMenuPrincipal();
-
-        } catch (Exception e) {
-            System.err.println("Error al volver al menú principal: " + e.getMessage());
-            e.printStackTrace();
-            cerrarVentanaActual();
-        }
-    }
-
-    private void abrirVentanaMenuPrincipal() {
-        try {
-            System.out.println("Abriendo menú principal...");
-
-            java.net.URL url = getClass().getResource("/views/MenuPrincipal.fxml");
-            if (url == null) {
-                System.err.println("ERROR: No se encuentra MenuPrincipal.fxml");
-                return;
-            }
-
-            FXMLLoader loader = new FXMLLoader(url);
-            Parent root = loader.load();
-
-            Stage stage = new Stage();
-            stage.setTitle("Sistema de Gestión de Estudiantes");
-            stage.setScene(new Scene(root, 600, 400));
-            stage.show();
-
-            System.out.println("Menú principal abierto exitosamente");
-
-        } catch (IOException e) {
-            System.err.println("Error al abrir menú principal: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    private void cerrarVentanaActual() {
-        try {
-            for (Window window : Window.getWindows()) {
-                if (window.isShowing() && window instanceof Stage) {
-                    ((Stage) window).close();
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void limpiarCamposEstudiante() {
-        txtIdentificacion.clear();
-        txtNombre.clear();
-        txtBuscar.clear();
-    }
-
-    private void mostrarAlerta(String titulo, String mensaje, Alert.AlertType tipo) {
-        Alert alert = new Alert(tipo);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
     }
 
     @FXML
@@ -354,18 +160,11 @@ public class MenuProfesorController {
         // Obtener todas las notas
         ArrayList<Nota> todasNotas = gestorNotas.obtenerNotas();
 
-        // DEBUG: Verificar datos
-        System.out.println("=== DEBUG ===");
-        System.out.println("Estudiante seleccionado ID: " + estudianteSeleccionado.getId());
-        System.out.println("Total notas en sistema: " + todasNotas.size());
-
-        // Filtrar notas del estudiante seleccionado - CORRECCIÓN AQUÍ
+        // Filtrar notas del estudiante seleccionado
         ArrayList<Nota> notasEstudiante = new ArrayList<>();
         for (Nota nota : todasNotas) {
-            // COMPARACIÓN CORREGIDA: Comparar int con int
             if (nota.getIdEstudiante() == estudianteSeleccionado.getId()) {
                 notasEstudiante.add(nota);
-                System.out.println("Nota encontrada: " + nota.getId() + " - " + nota.getNota());
             }
         }
 
@@ -377,196 +176,439 @@ public class MenuProfesorController {
             return;
         }
 
-        // Construir mensaje con las notas
-        StringBuilder mensaje = new StringBuilder();
-        mensaje.append("=== NOTAS DE ").append(estudianteSeleccionado.getNombre().toUpperCase()).append(" ===\n\n");
-        mensaje.append("ID: ").append(estudianteSeleccionado.getId()).append("\n");
-        mensaje.append("Identificación: ").append(estudianteSeleccionado.getIdentificacion()).append("\n\n");
+        // Crear ventana con tabla
+        crearVentanaNotasTabla(estudianteSeleccionado, notasEstudiante);
+    }
 
-        // Obtener materias para mostrar nombres
+    private void crearVentanaNotasTabla(Estudiante estudiante, ArrayList<Nota> notasEstudiante) {
+        try {
+            // Crear nueva ventana
+            Stage stage = new Stage();
+            stage.setTitle("Notas de " + estudiante.getNombre());
+
+            // Crear contenedor principal
+            VBox root = new VBox(20);
+            root.setStyle("-fx-padding: 20; -fx-background-color: #1D1D47;");
+
+            // Título
+            Label titulo = new Label("📊 NOTAS DEL ESTUDIANTE");
+            titulo.setStyle("-fx-text-fill: #73FFFF; -fx-font-size: 24px; -fx-font-weight: bold;");
+
+            // Información del estudiante
+            VBox infoBox = new VBox(10);
+            infoBox.setStyle("-fx-padding: 15; -fx-background-color: #000000; -fx-background-radius: 10;");
+
+            GridPane infoGrid = new GridPane();
+            infoGrid.setHgap(20);
+            infoGrid.setVgap(10);
+
+            Label lblNombre = new Label("Nombre:");
+            lblNombre.setStyle("-fx-text-fill: white;");
+            Label lblNombreValor = new Label(estudiante.getNombre());
+            lblNombreValor.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
+
+            Label lblIdentificacion = new Label("Identificación:");
+            lblIdentificacion.setStyle("-fx-text-fill: white;");
+            Label lblIdentificacionValor = new Label(estudiante.getIdentificacion());
+            lblIdentificacionValor.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
+
+            Label lblId = new Label("ID:");
+            lblId.setStyle("-fx-text-fill: white;");
+            Label lblIdValor = new Label(String.valueOf(estudiante.getId()));
+            lblIdValor.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
+
+            infoGrid.add(lblNombre, 0, 0);
+            infoGrid.add(lblNombreValor, 1, 0);
+            infoGrid.add(lblIdentificacion, 2, 0);
+            infoGrid.add(lblIdentificacionValor, 3, 0);
+            infoGrid.add(lblId, 0, 1);
+            infoGrid.add(lblIdValor, 1, 1);
+
+            // Crear título para la sección de información
+            Label infoTitulo = new Label("📋 INFORMACIÓN DEL ESTUDIANTE");
+            infoTitulo.setStyle("-fx-text-fill: #73FFFF; -fx-font-size: 18px; -fx-font-weight: bold;");
+
+            infoBox.getChildren().addAll(infoTitulo, infoGrid);
+
+            // Crear tabla
+            VBox tablaBox = new VBox(10);
+            tablaBox.setStyle("-fx-padding: 15; -fx-background-color: #000000; -fx-background-radius: 10;");
+
+            Label tablaTitulo = new Label("📊 NOTAS REGISTRADAS");
+            tablaTitulo.setStyle("-fx-text-fill: #73FFFF; -fx-font-size: 18px; -fx-font-weight: bold;");
+
+            // Crear tabla
+            TableView<NotaMateria> tabla = new TableView<>();
+            tabla.setPrefHeight(300);
+            tabla.setStyle("-fx-background-color: #2d2d2d; -fx-control-inner-background: #2d2d2d;");
+
+            // Columnas
+            TableColumn<NotaMateria, String> colMateria = new TableColumn<>("MATERIA");
+            colMateria.setPrefWidth(200);
+            colMateria.setCellValueFactory(new PropertyValueFactory<>("materia"));
+
+            TableColumn<NotaMateria, String> colNotas = new TableColumn<>("NOTAS");
+            colNotas.setPrefWidth(250);
+            colNotas.setCellValueFactory(new PropertyValueFactory<>("notas"));
+
+            TableColumn<NotaMateria, String> colPromedio = new TableColumn<>("PROMEDIO");
+            colPromedio.setPrefWidth(100);
+            colPromedio.setCellValueFactory(new PropertyValueFactory<>("promedio"));
+
+            TableColumn<NotaMateria, String> colEstado = new TableColumn<>("ESTADO");
+            colEstado.setPrefWidth(100);
+            colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
+
+            // Aplicar estilos a las celdas
+            configurarEstiloCeldas(colMateria, colNotas, colPromedio, colEstado);
+
+            tabla.getColumns().addAll(colMateria, colNotas, colPromedio, colEstado);
+
+            // Obtener datos para la tabla
+            ObservableList<NotaMateria> listaNotas = procesarNotasParaTabla(estudiante, notasEstudiante);
+            tabla.setItems(listaNotas);
+
+            // Calcular promedio general usando GestorEstudiante
+            double promedioGeneral = gestorEstudiantes.promedioGeneral(estudiante.getId());
+
+            HBox promedioBox = new HBox(20);
+            promedioBox.setAlignment(Pos.CENTER_RIGHT);
+
+            Label lblPromedio = new Label("PROMEDIO GENERAL:");
+            lblPromedio.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
+
+            Label lblPromedioValor = new Label();
+            Label lblEstado = new Label();
+
+            lblPromedioValor.setText(String.format("%.2f", promedioGeneral));
+
+            if (promedioGeneral >= 3.5) {
+                lblPromedioValor.setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold; -fx-font-size: 18px;");
+                lblEstado.setText("APROBADO ✓");
+                lblEstado.setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold; -fx-font-size: 16px;");
+            } else if (promedioGeneral >= 3.0) {
+                lblPromedioValor.setStyle("-fx-text-fill: #FFC107; -fx-font-weight: bold; -fx-font-size: 18px;");
+                lblEstado.setText("APROBADO ✓");
+                lblEstado.setStyle("-fx-text-fill: #FFC107; -fx-font-weight: bold; -fx-font-size: 16px;");
+            } else {
+                lblPromedioValor.setStyle("-fx-text-fill: #F44336; -fx-font-weight: bold; -fx-font-size: 18px;");
+                lblEstado.setText("REPROBADO ✗");
+                lblEstado.setStyle("-fx-text-fill: #F44336; -fx-font-weight: bold; -fx-font-size: 16px;");
+            }
+
+            promedioBox.getChildren().addAll(lblPromedio, lblPromedioValor, lblEstado);
+
+            tablaBox.getChildren().addAll(tablaTitulo, tabla, promedioBox);
+
+            // Botón cerrar
+            Button btnCerrar = new Button("Cerrar");
+            btnCerrar.setStyle("-fx-background-color: #FF5252; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-height: 40; -fx-pref-width: 120;");
+            btnCerrar.setOnAction(e -> stage.close());
+
+            // Agregar todo al root
+            root.getChildren().addAll(titulo, infoBox, tablaBox, btnCerrar);
+
+            // Mostrar ventana
+            Scene scene = new Scene(root, 700, 600);
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo crear la ventana de notas: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    private ObservableList<NotaMateria> procesarNotasParaTabla(Estudiante estudiante, ArrayList<Nota> notasEstudiante) {
+        ObservableList<NotaMateria> listaNotas = FXCollections.observableArrayList();
         List<Materia> materias = gestorMaterias.getMaterias();
-
-        // Agrupar notas por materia
         Map<String, ArrayList<Double>> notasPorMateria = new HashMap<>();
 
+        // Agrupar notas por materia
         for (Nota nota : notasEstudiante) {
             String nombreMateria = "Materia " + nota.getIdMateria();
-
-            // Buscar nombre de la materia
             for (Materia materia : materias) {
                 if (materia.getId() == nota.getIdMateria()) {
                     nombreMateria = materia.getNombre();
                     break;
                 }
             }
-
             if (!notasPorMateria.containsKey(nombreMateria)) {
                 notasPorMateria.put(nombreMateria, new ArrayList<>());
             }
             notasPorMateria.get(nombreMateria).add(nota.getNota());
         }
 
-        // Mostrar notas por materia
+        // Crear objetos NotaMateria para la tabla
         for (Map.Entry<String, ArrayList<Double>> entry : notasPorMateria.entrySet()) {
-            mensaje.append(entry.getKey()).append(":\n");
+            StringBuilder notasTexto = new StringBuilder();
+            double sumaMateria = 0;
 
-            double suma = 0;
-            for (Double nota : entry.getValue()) {
-                mensaje.append("  • ").append(String.format("%.2f", nota)).append("\n");
-                suma += nota;
+            for (int i = 0; i < entry.getValue().size(); i++) {
+                Double nota = entry.getValue().get(i);
+                notasTexto.append(String.format("%.1f", nota));
+                if (i < entry.getValue().size() - 1) notasTexto.append(" | ");
+                sumaMateria += nota;
             }
 
-            double promedio = suma / entry.getValue().size();
-            mensaje.append("  Promedio: ").append(String.format("%.2f", promedio)).append("\n\n");
+            double promedioMateria = sumaMateria / entry.getValue().size();
+            String estado = (promedioMateria >= 3.0) ? "APROBADO ✓" : "REPROBADO ✗";
+
+            listaNotas.add(new NotaMateria(
+                    entry.getKey(),
+                    notasTexto.toString(),
+                    String.format("%.2f", promedioMateria),
+                    estado
+            ));
         }
 
-        // Mostrar promedio general
-        double promedioGeneral = 0;
-        int totalNotas = 0;
-        for (ArrayList<Double> notas : notasPorMateria.values()) {
-            for (Double nota : notas) {
-                promedioGeneral += nota;
-                totalNotas++;
+        return listaNotas;
+    }
+
+    private void configurarEstiloCeldas(
+            TableColumn<NotaMateria, String> colMateria,
+            TableColumn<NotaMateria, String> colNotas,
+            TableColumn<NotaMateria, String> colPromedio,
+            TableColumn<NotaMateria, String> colEstado) {
+
+        colMateria.setCellFactory(column -> new TableCell<NotaMateria, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    setStyle("-fx-text-fill: white; -fx-font-size: 13px; -fx-alignment: CENTER_LEFT; -fx-padding: 5;");
+                }
             }
+        });
+
+        colNotas.setCellFactory(column -> new TableCell<NotaMateria, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    setStyle("-fx-text-fill: white; -fx-font-size: 13px; -fx-alignment: CENTER; -fx-padding: 5;");
+                }
+            }
+        });
+
+        colPromedio.setCellFactory(column -> new TableCell<NotaMateria, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    try {
+                        double valor = Double.parseDouble(item);
+                        if (valor >= 3.5) {
+                            setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold; -fx-font-size: 13px; -fx-alignment: CENTER; -fx-padding: 5;");
+                        } else if (valor >= 3.0) {
+                            setStyle("-fx-text-fill: #FFC107; -fx-font-weight: bold; -fx-font-size: 13px; -fx-alignment: CENTER; -fx-padding: 5;");
+                        } else {
+                            setStyle("-fx-text-fill: #F44336; -fx-font-weight: bold; -fx-font-size: 13px; -fx-alignment: CENTER; -fx-padding: 5;");
+                        }
+                    } catch (NumberFormatException e) {
+                        setStyle("-fx-text-fill: white; -fx-font-size: 13px; -fx-alignment: CENTER; -fx-padding: 5;");
+                    }
+                }
+            }
+        });
+
+        colEstado.setCellFactory(column -> new TableCell<NotaMateria, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    if (item.contains("APROBADO") || item.contains("✓")) {
+                        setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold; -fx-font-size: 13px; -fx-alignment: CENTER; -fx-padding: 5;");
+                    } else {
+                        setStyle("-fx-text-fill: #F44336; -fx-font-weight: bold; -fx-font-size: 13px; -fx-alignment: CENTER; -fx-padding: 5;");
+                    }
+                }
+            }
+        });
+    }
+
+    // ================ MÉTODOS PARA NOTAS ================
+
+    @FXML
+    private void agregarNota() {
+        Estudiante estudiante = comboEstudiantes.getValue();
+        Materia materia = comboMaterias.getValue();
+        String notaTexto = txtNota.getText().trim();
+
+        if (estudiante == null || materia == null || notaTexto.isEmpty()) {
+            mostrarAlerta("Error", "Complete todos los campos", Alert.AlertType.ERROR);
+            return;
         }
 
-        if (totalNotas > 0) {
-            promedioGeneral /= totalNotas;
-            mensaje.append(" PROMEDIO GENERAL: ").append(String.format("%.2f", promedioGeneral));
+        try {
+            double nota = Double.parseDouble(notaTexto);
+
+            if (nota < 0 || nota > 5) {
+                mostrarAlerta("Error", "La nota debe estar entre 0 y 5", Alert.AlertType.ERROR);
+                return;
+            }
+
+            // Usar GestorEstudiante para agregar nota (según tu implementación)
+            boolean agregada = gestorEstudiantes.agregarNota(
+                    String.valueOf(estudiante.getId()),
+                    materia.getNombre(),
+                    nota
+            );
+
+            if (agregada) {
+                mostrarAlerta("Éxito", "Nota agregada correctamente", Alert.AlertType.INFORMATION);
+                txtNota.clear();
+            } else {
+                mostrarAlerta("Error", "No se pudo agregar la nota", Alert.AlertType.ERROR);
+            }
+
+        } catch (NumberFormatException e) {
+            mostrarAlerta("Error", "Ingrese un número válido", Alert.AlertType.ERROR);
         }
-
-        // Mostrar diálogo con las notas
-        TextArea textArea = new TextArea(mensaje.toString());
-        textArea.setEditable(false);
-        textArea.setWrapText(true);
-        textArea.setPrefSize(500, 400);
-
-        ScrollPane scrollPane = new ScrollPane(textArea);
-        scrollPane.setFitToWidth(true);
-
-        Dialog<Void> dialog = new Dialog<>();
-        dialog.setTitle("Notas del Estudiante");
-        dialog.setHeaderText("Notas de: " + estudianteSeleccionado.getNombre());
-        dialog.getDialogPane().setContent(scrollPane);
-        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
-
-        Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
-        stage.setAlwaysOnTop(true);
-
-        dialog.showAndWait();
     }
 
     @FXML
     private void eliminarNota() {
-        // Obtener todas las notas
-        ArrayList<Nota> todasNotas = gestorNotas.obtenerNotas();
+        // Para eliminar nota, necesitarías seleccionar una nota específica
+        // Por ahora, mostramos un mensaje informativo
+        mostrarAlerta("Funcionalidad", "Para eliminar una nota específica, seleccione una nota de la lista", Alert.AlertType.INFORMATION);
+    }
 
-        if (todasNotas.isEmpty()) {
-            mostrarAlerta("Información", "No hay notas registradas en el sistema.", Alert.AlertType.INFORMATION);
+    // ================ MÉTODOS PARA MATERIAS ================
+
+    @FXML
+    private void agregarMateria() {
+        String nombre = txtNuevaMateria.getText().trim();
+
+        if (nombre.isEmpty()) {
+            mostrarAlerta("Error", "Ingrese el nombre de la materia", Alert.AlertType.ERROR);
             return;
         }
 
-        // Crear diálogo para seleccionar nota
-        Dialog<Nota> dialog = new Dialog<>();
-        dialog.setTitle("Eliminar Nota");
-        dialog.setHeaderText("Seleccione la nota a eliminar:");
+        // Agregar materia usando GestorMaterias
+        boolean agregada = gestorMaterias.agregarMateria(nombre);
 
-        // Crear lista de notas
-        ListView<Nota> listView = new ListView<>();
-        ObservableList<Nota> listaNotas = FXCollections.observableArrayList(todasNotas);
-        listView.setItems(listaNotas);
+        if (agregada) {
+            mostrarAlerta("Éxito", "Materia agregada correctamente", Alert.AlertType.INFORMATION);
+            txtNuevaMateria.clear();
+            cargarMateriasEnComboBox();
+            cargarMateriasEnListView();
+        } else {
+            mostrarAlerta("Error", "La materia ya existe o no se pudo agregar", Alert.AlertType.ERROR);
+        }
+    }
 
-        // Formatear cómo se muestran las notas
-        listView.setCellFactory(param -> new ListCell<Nota>() {
-            @Override
-            protected void updateItem(Nota nota, boolean empty) {
-                super.updateItem(nota, empty);
-                if (empty || nota == null) {
-                    setText(null);
+    @FXML
+    private void eliminarMateria() {
+        Materia seleccionada = listaMaterias.getSelectionModel().getSelectedItem();
+
+        if (seleccionada == null) {
+            mostrarAlerta("Error", "Seleccione una materia de la lista", Alert.AlertType.WARNING);
+            return;
+        }
+
+        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmacion.setTitle("Confirmar eliminación");
+        confirmacion.setHeaderText("¿Eliminar materia?");
+        confirmacion.setContentText("Se eliminará: " + seleccionada.getNombre());
+
+        confirmacion.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                boolean eliminada = gestorMaterias.eliminarMateria(seleccionada.getId());
+
+                if (eliminada) {
+                    mostrarAlerta("Éxito", "Materia eliminada", Alert.AlertType.INFORMATION);
+                    cargarMateriasEnComboBox();
+                    cargarMateriasEnListView();
                 } else {
-                    // Buscar estudiante
-                    Estudiante estudiante = null;
-                    for (Estudiante e : gestorEstudiantes.getEstudiantes()) {
-                        if (e.getId() == nota.getIdEstudiante()) {  // CORRECCIÓN: Comparar int con int
-                            estudiante = e;
-                            break;
-                        }
-                    }
-
-                    // Buscar materia
-                    String nombreMateria = "Materia " + nota.getIdMateria();
-                    for (Materia m : gestorMaterias.getMaterias()) {
-                        if (m.getId() == nota.getIdMateria()) {
-                            nombreMateria = m.getNombre();
-                            break;
-                        }
-                    }
-
-                    String nombreEstudiante = estudiante != null ? estudiante.getNombre() : "ID: " + nota.getIdEstudiante();
-                    setText("ID Nota: " + nota.getId() + " | " + nombreEstudiante +
-                            " | " + nombreMateria + " | Nota: " + String.format("%.2f", nota.getNota()));
+                    mostrarAlerta("Error", "No se pudo eliminar la materia", Alert.AlertType.ERROR);
                 }
             }
         });
+    }
 
-        ScrollPane scrollPane = new ScrollPane(listView);
-        scrollPane.setPrefSize(600, 300);
+    // ================ MÉTODOS DE CONFIGURACIÓN ================
 
-        dialog.getDialogPane().setContent(scrollPane);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+    @FXML
+    private void cambiarContrasena() {
+        String nuevaContrasena = txtNuevaContrasena.getText().trim();
 
-        // Configurar resultado
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == ButtonType.OK) {
-                return listView.getSelectionModel().getSelectedItem();
-            }
-            return null;
-        });
+        if (nuevaContrasena.length() != 4 || !nuevaContrasena.matches("\\d{4}")) {
+            mostrarAlerta("Error", "La contraseña debe tener 4 dígitos numéricos", Alert.AlertType.ERROR);
+            return;
+        }
 
-        // Mostrar diálogo y procesar resultado
-        dialog.showAndWait().ifPresent(notaSeleccionada -> {
-            if (notaSeleccionada != null) {
-                // Confirmar eliminación
-                Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
-                confirmacion.setTitle("Confirmar Eliminación");
-                confirmacion.setHeaderText("¿Está seguro de eliminar esta nota?");
+        // Usar el método correcto de GestorContrasena
+        GestorContrasena.cambiarContraseña(nuevaContrasena);
+        mostrarAlerta("Éxito", "Contraseña cambiada correctamente", Alert.AlertType.INFORMATION);
+        txtNuevaContrasena.clear();
+    }
 
-                // Buscar información para el mensaje
-                Estudiante estudiante = null;
-                for (Estudiante e : gestorEstudiantes.getEstudiantes()) {
-                    if (e.getId() == notaSeleccionada.getIdEstudiante()) {  // CORRECCIÓN: Comparar int con int
-                        estudiante = e;
-                        break;
-                    }
-                }
+    @FXML
+    private void volverAlMenuPrincipal() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/MenuPrincipal.fxml"));
+            Parent root = loader.load();
 
-                String nombreMateria = "Materia " + notaSeleccionada.getIdMateria();
-                for (Materia m : gestorMaterias.getMaterias()) {
-                    if (m.getId() == notaSeleccionada.getIdMateria()) {
-                        nombreMateria = m.getNombre();
-                        break;
-                    }
-                }
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Sistema de Gestión Estudiantil");
 
-                String mensajeConfirmacion = "Nota a eliminar:\n\n" +
-                        "ID Nota: " + notaSeleccionada.getId() + "\n" +
-                        "Estudiante: " + (estudiante != null ? estudiante.getNombre() : "ID: " + notaSeleccionada.getIdEstudiante()) + "\n" +
-                        "Materia: " + nombreMateria + "\n" +
-                        "Nota: " + String.format("%.2f", notaSeleccionada.getNota());
+            // Cerrar ventana actual
+            Stage stageActual = (Stage) txtIdentificacion.getScene().getWindow();
+            stageActual.close();
 
-                confirmacion.setContentText(mensajeConfirmacion);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo cargar el menú principal", Alert.AlertType.ERROR);
+        }
+    }
 
-                confirmacion.showAndWait().ifPresent(response -> {
-                    if (response == ButtonType.OK) {
-                        // Eliminar la nota
-                        if (gestorNotas.eliminarNota(notaSeleccionada.getId())) {
-                            mostrarAlerta("Éxito", "Nota eliminada correctamente.", Alert.AlertType.INFORMATION);
-                        } else {
-                            mostrarAlerta("Error", "No se pudo eliminar la nota.", Alert.AlertType.ERROR);
-                        }
-                    }
-                });
-            }
-        });
+    // ================ MÉTODOS AUXILIARES ================
+
+    private void cargarEstudiantesEnTabla() {
+        ObservableList<Estudiante> estudiantes = FXCollections.observableArrayList(gestorEstudiantes.getEstudiantes());
+        tablaEstudiantes.setItems(estudiantes);
+    }
+
+    private void cargarEstudiantesEnComboBox() {
+        ObservableList<Estudiante> estudiantes = FXCollections.observableArrayList(gestorEstudiantes.getEstudiantes());
+        comboEstudiantes.setItems(estudiantes);
+    }
+
+    private void cargarMateriasEnComboBox() {
+        ObservableList<Materia> materias = FXCollections.observableArrayList(gestorMaterias.getMaterias());
+        comboMaterias.setItems(materias);
+    }
+
+    private void cargarMateriasEnListView() {
+        ObservableList<Materia> materias = FXCollections.observableArrayList(gestorMaterias.getMaterias());
+        listaMaterias.setItems(materias);
+    }
+
+    private void mostrarAlerta(String titulo, String mensaje, Alert.AlertType tipo) {
+        Alert alert = new Alert(tipo);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 }
