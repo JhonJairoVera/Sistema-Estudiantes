@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox alignment="TOP_CENTER" prefHeight="500" prefWidth="600" spacing="15" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+<VBox alignment="TOP_CENTER" prefHeight="500" prefWidth="600" spacing="15" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
 
     <padding>
         <Insets bottom="30" left="30" right="30" top="30" />
@@ -18,14 +18,14 @@
     </ImageView>
 
     <!-- Nombre de la empresa -->
-    <Label style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Seguimiento y Progreso Mediante la Evaluación Sistemática" textAlignment="CENTER" wrapText="true">
+    <Label style="-fx-font-weight: bold; -fx-text-fill: #1a4baf;" text="Seguimiento y Progreso Mediante la Evaluación Sistemática" textAlignment="CENTER" wrapText="true">
         <font>
             <Font size="20" />
         </font>
     </Label>
 
     <!-- Significado del nombre -->
-    <Label style="-fx-text-fill: #34495e; -fx-font-style: italic;" text="SPES: Evaluación integral del progreso académico mediante métricas sistemáticas y seguimiento continuo" textAlignment="CENTER" wrapText="true">
+    <Label style="-fx-text-fill: #1a4baf; -fx-font-style: italic;" text="SPES: Evaluación integral del progreso académico mediante métricas sistemáticas y seguimiento continuo" textAlignment="CENTER" wrapText="true">
         <font>
             <Font size="12" />
         </font>
@@ -38,7 +38,7 @@
     <Label style="-fx-text-fill: #7f8c8d;" text="____________________________" />
 
     <!-- Título del equipo -->
-    <Label style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Equipo de Desarrollo">
+    <Label style="-fx-font-weight: bold; -fx-text-fill: #1a4baf;" text="Equipo de Desarrollo">
         <font>
             <Font size="16" />
         </font>

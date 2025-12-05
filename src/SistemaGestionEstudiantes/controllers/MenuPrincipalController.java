@@ -17,6 +17,7 @@ import SistemaGestionEstudiantes.GestorContrasena;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import javafx.stage.StageStyle;
 
 public class MenuPrincipalController {
 
@@ -171,6 +172,7 @@ public class MenuPrincipalController {
     }
 
     @FXML
+
     private void abrirMenuEstudiante() {
         System.out.println("Abriendo consulta de estudiante...");
 
@@ -179,10 +181,24 @@ public class MenuPrincipalController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/ConsultaEstudianteView.fxml"));
             Parent root = loader.load();
 
+            // Crear Stage
             Stage stage = new Stage();
             stage.setTitle("Consulta de Notas - Estudiante");
-            stage.setScene(new Scene(root));
-            stage.setResizable(false);
+
+            // Crear Scene y asignarla al Stage
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+
+            // IMPORTANTE: Permitir redimensionar y mostrar botones de ventana
+            stage.setResizable(true); // Permitir maximizar
+
+            // Asegurarse de que la ventana tenga decoraciones de sistema
+            stage.initStyle(StageStyle.DECORATED); // Esto es el valor por defecto
+
+            // Centrar en la pantalla
+            stage.centerOnScreen();
+
+            // Mostrar ventana
             stage.show();
 
             System.out.println("✓ Ventana de consulta de estudiante abierta correctamente");
