@@ -8,7 +8,8 @@
 <VBox spacing="20" style="-fx-padding: 20; -fx-background-color: #1D1D47;"
       xmlns="http://javafx.com/javafx/17.0.12"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="SistemaGestionEstudiantes.controllers.ConsultaEstudianteController">
+      fx:controller="SistemaGestionEstudiantes.controllers.ConsultaEstudianteController"
+      prefWidth="800" prefHeight="650"> <!-- AÑADIDO: Tamaño preferido -->
 
     <!-- Título -->
     <Label text="📚 CONSULTA DE NOTAS"
@@ -30,7 +31,9 @@
     </VBox>
 
     <!-- Información del estudiante -->
-    <VBox fx:id="infoEstudiante" spacing="10" style="-fx-padding: 15; -fx-background-color: #000000; -fx-background-radius: 10; -fx-opacity: 0;" visible="false">
+    <VBox fx:id="infoEstudiante" spacing="10" style="-fx-padding: 15; -fx-background-color: #000000; -fx-background-radius: 10; -fx-opacity: 0;"
+          visible="false" VBox.vgrow="NEVER">
+
         <Label text="📋 INFORMACIÓN DEL ESTUDIANTE"
                style="-fx-text-fill: #73FFFF; -fx-font-size: 18px; -fx-font-weight: bold;" />
 
@@ -47,7 +50,9 @@
     </VBox>
 
     <!-- Tabla de notas - ESTILOS CORREGIDOS -->
-    <VBox fx:id="contenedorNotas" spacing="10" style="-fx-padding: 15; -fx-background-color: #000000; -fx-background-radius: 10; -fx-opacity: 0;" visible="false">
+    <VBox fx:id="contenedorNotas" spacing="10" style="-fx-padding: 15; -fx-background-color: #000000; -fx-background-radius: 10; -fx-opacity: 0;"
+          visible="false" VBox.vgrow="ALWAYS">
+
         <Label text="📊 NOTAS REGISTRADAS"
                style="-fx-text-fill: #73FFFF; -fx-font-size: 18px; -fx-font-weight: bold;" />
 
@@ -57,7 +62,8 @@
                           -fx-control-inner-background: #2d2d2d;
                           -fx-table-cell-border-color: transparent;
                           -fx-text-fill: white;
-                          -fx-font-size: 13px;">
+                          -fx-font-size: 13px;"
+                   VBox.vgrow="ALWAYS">
 
             <columns>
                 <!-- COLUMNA MATERIA -->
@@ -86,15 +92,17 @@
     </VBox>
 
     <!-- Mensaje cuando no hay notas -->
-    <VBox fx:id="mensajeSinNotas" spacing="10" alignment="CENTER" style="-fx-padding: 30; -fx-background-color: #000000; -fx-background-radius: 10; -fx-opacity: 0;" visible="false">
+    <VBox fx:id="mensajeSinNotas" spacing="10" alignment="CENTER" style="-fx-padding: 30; -fx-background-color: #000000; -fx-background-radius: 10; -fx-opacity: 0;"
+          visible="false" VBox.vgrow="ALWAYS">
+
         <Label text="📭 NO HAY NOTAS REGISTRADAS"
                style="-fx-text-fill: #73FFFF; -fx-font-size: 20px; -fx-font-weight: bold;" />
         <Label text="Este estudiante no tiene notas registradas en el sistema."
                style="-fx-text-fill: white; -fx-font-size: 14px;" />
     </VBox>
 
-    <!-- Botones -->
-    <HBox spacing="30" alignment="CENTER" style="-fx-padding: 10;">
+    <!-- Botones - Asegurarse de que siempre estén visibles -->
+    <HBox spacing="30" alignment="CENTER" style="-fx-padding: 20;">
         <Button onAction="#nuevaBusqueda"
                 text="🔄 NUEVA BÚSQUEDA"
                 style="-fx-background-color: #1a4baf; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-height: 40; -fx-pref-width: 180;" />

@@ -44,9 +44,37 @@ public class MenuProfesorController {
 
     @FXML private PasswordField txtNuevaContrasena;
 
+    // NUEVOS ELEMENTOS PARA LA TABLA DE NOTAS
+    @FXML private TableView<NotaInfo> tablaNotas;
+    @FXML private TableColumn<NotaInfo, Integer> colNotaId;
+    @FXML private TableColumn<NotaInfo, String> colNotaEstudiante;
+    @FXML private TableColumn<NotaInfo, String> colNotaMateria;
+    @FXML private TableColumn<NotaInfo, Double> colNotaValor;
+
     private GestorEstudiante gestorEstudiantes = new GestorEstudiante();
     private GestorMaterias gestorMaterias = new GestorMaterias();
     private GestorNotas gestorNotas = new GestorNotas();
+    private ObservableList<NotaInfo> listaNotasInfo = FXCollections.observableArrayList();
+
+    // Clase auxiliar para mostrar información de notas en la tabla
+    public class NotaInfo {
+        private int id;
+        private String estudiante;
+        private String materia;
+        private double nota;
+
+        public NotaInfo(int id, String estudiante, String materia, double nota) {
+            this.id = id;
+            this.estudiante = estudiante;
+            this.materia = materia;
+            this.nota = nota;
+        }
+
+        public int getId() { return id; }
+        public String getEstudiante() { return estudiante; }
+        public String getMateria() { return materia; }
+        public double getNota() { return nota; }
+    }
 
     @FXML
     public void initialize() {
@@ -57,10 +85,17 @@ public class MenuProfesorController {
         colIdentificacion.setCellValueFactory(new PropertyValueFactory<>("identificacion"));
         colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
 
+        // Configurar tabla de notas
+        colNotaId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colNotaEstudiante.setCellValueFactory(new PropertyValueFactory<>("estudiante"));
+        colNotaMateria.setCellValueFactory(new PropertyValueFactory<>("materia"));
+        colNotaValor.setCellValueFactory(new PropertyValueFactory<>("nota"));
+
         cargarEstudiantesEnTabla();
         cargarEstudiantesEnComboBox();
         cargarMateriasEnComboBox();
         cargarMateriasEnListView();
+        cargarNotasEnTabla(); // Nueva función para cargar notas
     }
 
     // ================ MÉTODOS PARA ESTUDIANTES ================
@@ -475,6 +510,7 @@ public class MenuProfesorController {
             if (agregada) {
                 mostrarAlerta("Éxito", "Nota agregada correctamente", Alert.AlertType.INFORMATION);
                 txtNota.clear();
+                cargarNotasEnTabla(); // Actualizar la tabla de notas
             } else {
                 mostrarAlerta("Error", "No se pudo agregar la nota", Alert.AlertType.ERROR);
             }
@@ -486,9 +522,73 @@ public class MenuProfesorController {
 
     @FXML
     private void eliminarNota() {
-        // Para eliminar nota, necesitarías seleccionar una nota específica
-        // Por ahora, mostramos un mensaje informativo
-        mostrarAlerta("Funcionalidad", "Para eliminar una nota específica, seleccione una nota de la lista", Alert.AlertType.INFORMATION);
+        NotaInfo notaSeleccionada = tablaNotas.getSelectionModel().getSelectedItem();
+
+        if (notaSeleccionada == null) {
+            mostrarAlerta("Error", "Seleccione una nota de la tabla para eliminar", Alert.AlertType.WARNING);
+            return;
+        }
+
+        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmacion.setTitle("Confirmar eliminación");
+        confirmacion.setHeaderText("¿Eliminar nota?");
+        confirmacion.setContentText("Se eliminará la nota del estudiante: " + notaSeleccionada.getEstudiante() +
+                "\nMateria: " + notaSeleccionada.getMateria() +
+                "\nNota: " + notaSeleccionada.getNota());
+
+        confirmacion.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                boolean eliminada = gestorNotas.eliminarNota(notaSeleccionada.getId());
+
+                if (eliminada) {
+                    mostrarAlerta("Éxito", "Nota eliminada correctamente", Alert.AlertType.INFORMATION);
+                    cargarNotasEnTabla(); // Actualizar la tabla
+                } else {
+                    mostrarAlerta("Error", "No se pudo eliminar la nota", Alert.AlertType.ERROR);
+                }
+            }
+        });
+    }
+
+    // NUEVO MÉTODO: Cargar notas en la tabla
+    @FXML
+    private void cargarNotasEnTabla() {
+        listaNotasInfo.clear();
+
+        // Obtener todas las notas
+        ArrayList<Nota> todasNotas = gestorNotas.obtenerNotas();
+        ArrayList<Estudiante> todosEstudiantes = gestorEstudiantes.getEstudiantes();
+        ArrayList<Materia> todasMaterias = gestorMaterias.getMaterias();
+
+        for (Nota nota : todasNotas) {
+            // Buscar nombre del estudiante
+            String nombreEstudiante = "Desconocido";
+            for (Estudiante e : todosEstudiantes) {
+                if (e.getId() == nota.getIdEstudiante()) {
+                    nombreEstudiante = e.getNombre();
+                    break;
+                }
+            }
+
+            // Buscar nombre de la materia
+            String nombreMateria = "Desconocida";
+            for (Materia m : todasMaterias) {
+                if (m.getId() == nota.getIdMateria()) {
+                    nombreMateria = m.getNombre();
+                    break;
+                }
+            }
+
+            // Agregar a la lista
+            listaNotasInfo.add(new NotaInfo(
+                    nota.getId(),
+                    nombreEstudiante,
+                    nombreMateria,
+                    nota.getNota()
+            ));
+        }
+
+        tablaNotas.setItems(listaNotasInfo);
     }
 
     // ================ MÉTODOS PARA MATERIAS ================
@@ -524,19 +624,33 @@ public class MenuProfesorController {
             return;
         }
 
+        // Contar cuántas notas tiene esta materia
+        int cantidadNotas = gestorMaterias.contarNotasPorMateria(seleccionada.getId());
+
         Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
         confirmacion.setTitle("Confirmar eliminación");
         confirmacion.setHeaderText("¿Eliminar materia?");
-        confirmacion.setContentText("Se eliminará: " + seleccionada.getNombre());
+
+        String mensaje = "Se eliminará: " + seleccionada.getNombre();
+        if (cantidadNotas > 0) {
+            mensaje += "\n\n⚠️ ADVERTENCIA: Esta materia tiene " + cantidadNotas +
+                    " nota(s) registrada(s).";
+            mensaje += "\nTodas las notas asociadas también se eliminarán.";
+        }
+        confirmacion.setContentText(mensaje);
 
         confirmacion.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
                 boolean eliminada = gestorMaterias.eliminarMateria(seleccionada.getId());
 
                 if (eliminada) {
-                    mostrarAlerta("Éxito", "Materia eliminada", Alert.AlertType.INFORMATION);
+                    mostrarAlerta("Éxito",
+                            "Materia eliminada" +
+                                    (cantidadNotas > 0 ? " junto con " + cantidadNotas + " nota(s)" : ""),
+                            Alert.AlertType.INFORMATION);
                     cargarMateriasEnComboBox();
                     cargarMateriasEnListView();
+                    cargarNotasEnTabla(); // Actualizar tabla de notas
                 } else {
                     mostrarAlerta("Error", "No se pudo eliminar la materia", Alert.AlertType.ERROR);
                 }

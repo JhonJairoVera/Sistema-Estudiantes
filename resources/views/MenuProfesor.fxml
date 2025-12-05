@@ -126,12 +126,27 @@
                                 style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-height: 40; -fx-pref-width: 200;"/>
                     </VBox>
 
-                    <!-- Eliminar Nota -->
+                    <!-- Eliminar Nota (Nueva versión con tabla) -->
                     <VBox spacing="15" style="-fx-padding: 20; -fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 10; -fx-border-width: 1;">
-                        <Label text="🗑️ ELIMINAR NOTA"
+                        <Label text="📋 TODAS LAS NOTAS REGISTRADAS"
                                style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1D1D47;"/>
-                        <Button text="Eliminar Nota" onAction="#eliminarNota"
-                                style="-fx-background-color: #F44336; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-height: 40; -fx-pref-width: 200;"/>
+
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <Button text="🔄 Actualizar Lista" onAction="#cargarNotasEnTabla"
+                                    style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-height: 35;"/>
+                            <Button text="🗑️ Eliminar Nota Seleccionada" onAction="#eliminarNota"
+                                    style="-fx-background-color: #F44336; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-height: 35;"/>
+                        </HBox>
+
+                        <TableView fx:id="tablaNotas" prefHeight="250"
+                                   style="-fx-border-color: #e0e0e0; -fx-border-radius: 5;">
+                            <columns>
+                                <TableColumn fx:id="colNotaId" text="ID" prefWidth="80"/>
+                                <TableColumn fx:id="colNotaEstudiante" text="Estudiante" prefWidth="200"/>
+                                <TableColumn fx:id="colNotaMateria" text="Materia" prefWidth="200"/>
+                                <TableColumn fx:id="colNotaValor" text="Nota" prefWidth="100"/>
+                            </columns>
+                        </TableView>
                     </VBox>
                 </VBox>
             </Tab>
