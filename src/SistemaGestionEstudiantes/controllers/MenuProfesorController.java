@@ -154,6 +154,7 @@ public class MenuProfesorController {
     }
 
     @FXML
+
     private void eliminarEstudiante() {
         Estudiante seleccionado = tablaEstudiantes.getSelectionModel().getSelectedItem();
 
@@ -170,19 +171,25 @@ public class MenuProfesorController {
         confirmacion.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
                 // Convertir int id a String para el método eliminarEstudiante
-                boolean eliminado = gestorEstudiantes.eliminarEstudiante(String.valueOf(seleccionado.getId()));
+                boolean eliminado = gestorEstudiantes.eliminarEstudiante(
+                        String.valueOf(seleccionado.getId())
+                );
 
                 if (eliminado) {
                     mostrarAlerta("Éxito", "Estudiante eliminado", Alert.AlertType.INFORMATION);
+
+                    // ACTUALIZAR TODAS LAS TABLAS
                     cargarEstudiantesEnTabla();
                     cargarEstudiantesEnComboBox();
+                    cargarNotasEnTabla(); // ¡ESTO ES LO QUE FALTA!
+
                 } else {
-                    mostrarAlerta("Error", "No se pudo eliminar el estudiante", Alert.AlertType.ERROR);
+                    mostrarAlerta("Error", "No se pudo eliminar el estudiante",
+                            Alert.AlertType.ERROR);
                 }
             }
         });
     }
-
     @FXML
     private void verNotasDelSeleccionado() {
         Estudiante estudianteSeleccionado = tablaEstudiantes.getSelectionModel().getSelectedItem();
@@ -552,43 +559,65 @@ public class MenuProfesorController {
 
     // NUEVO MÉTODO: Cargar notas en la tabla
     @FXML
+
     private void cargarNotasEnTabla() {
-        listaNotasInfo.clear();
+        try {
+            listaNotasInfo.clear();
 
-        // Obtener todas las notas
-        ArrayList<Nota> todasNotas = gestorNotas.obtenerNotas();
-        ArrayList<Estudiante> todosEstudiantes = gestorEstudiantes.getEstudiantes();
-        ArrayList<Materia> todasMaterias = gestorMaterias.getMaterias();
+            // Obtener todas las notas
+            ArrayList<Nota> todasNotas = gestorNotas.obtenerNotas();
+            ArrayList<Estudiante> todosEstudiantes = gestorEstudiantes.getEstudiantes();
+            ArrayList<Materia> todasMaterias = gestorMaterias.getMaterias();
 
-        for (Nota nota : todasNotas) {
-            // Buscar nombre del estudiante
-            String nombreEstudiante = "Desconocido";
+            // Crear mapas para búsqueda rápida
+            java.util.Map<Integer, String> mapaEstudiantes = new java.util.HashMap<>();
             for (Estudiante e : todosEstudiantes) {
-                if (e.getId() == nota.getIdEstudiante()) {
-                    nombreEstudiante = e.getNombre();
-                    break;
-                }
+                mapaEstudiantes.put(e.getId(), e.getNombre());
             }
 
-            // Buscar nombre de la materia
-            String nombreMateria = "Desconocida";
+            java.util.Map<Integer, String> mapaMaterias = new java.util.HashMap<>();
             for (Materia m : todasMaterias) {
-                if (m.getId() == nota.getIdMateria()) {
-                    nombreMateria = m.getNombre();
-                    break;
-                }
+                mapaMaterias.put(m.getId(), m.getNombre());
             }
 
-            // Agregar a la lista
-            listaNotasInfo.add(new NotaInfo(
-                    nota.getId(),
-                    nombreEstudiante,
-                    nombreMateria,
-                    nota.getNota()
-            ));
-        }
+            System.out.println("Cargando notas... Total: " + todasNotas.size());
+            System.out.println("Estudiantes en mapa: " + mapaEstudiantes.size());
+            System.out.println("Materias en mapa: " + mapaMaterias.size());
 
-        tablaNotas.setItems(listaNotasInfo);
+            // Filtrar solo notas de estudiantes y materias existentes
+            for (Nota nota : todasNotas) {
+                // Verificar si el estudiante existe
+                if (!mapaEstudiantes.containsKey(nota.getIdEstudiante())) {
+                    System.out.println("Nota omitida - Estudiante no existe: " + nota.getIdEstudiante());
+                    continue; // Saltar esta nota
+                }
+
+                // Verificar si la materia existe
+                if (!mapaMaterias.containsKey(nota.getIdMateria())) {
+                    System.out.println("Nota omitida - Materia no existe: " + nota.getIdMateria());
+                    continue; // Saltar esta nota
+                }
+
+                // Obtener nombres
+                String nombreEstudiante = mapaEstudiantes.get(nota.getIdEstudiante());
+                String nombreMateria = mapaMaterias.get(nota.getIdMateria());
+
+                // Agregar a la lista
+                listaNotasInfo.add(new NotaInfo(
+                        nota.getId(),
+                        nombreEstudiante,
+                        nombreMateria,
+                        nota.getNota()
+                ));
+            }
+
+            System.out.println("Notas mostradas en tabla: " + listaNotasInfo.size());
+            tablaNotas.setItems(listaNotasInfo);
+
+        } catch (Exception e) {
+            System.err.println("Error en cargarNotasEnTabla: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     // ================ MÉTODOS PARA MATERIAS ================
