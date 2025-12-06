@@ -147,21 +147,29 @@ public class MenuPrincipalController {
         try {
             System.out.println("Cargando MenuProfesor.fxml...");
 
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/views/MenuProfesor.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/MenuProfesor.fxml"));
             Parent root = loader.load();
 
             System.out.println("FXML cargado exitosamente");
 
             Stage profesorStage = new Stage();
             profesorStage.setTitle("Menú del Profesor");
-            profesorStage.setScene(new Scene(root, 900, 700));
 
+            // Crear Scene
+            Scene scene = new Scene(root);
+            profesorStage.setScene(scene);
+
+            // Configurar ventana
+            profesorStage.setResizable(true);
+            profesorStage.setMaximized(true); // <-- ABRE MAXIMIZADA
+
+            // Cerrar ventana actual
             Stage stageActual = (Stage) btnDocente.getScene().getWindow();
             stageActual.close();
 
+            // Mostrar ventana
             profesorStage.show();
-            System.out.println("Ventana del profesor mostrada");
+            System.out.println("✓ Ventana del profesor mostrada maximizada");
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -198,6 +206,9 @@ public class MenuPrincipalController {
             // Centrar en la pantalla
             stage.centerOnScreen();
 
+            // ESTA LÍNEA ABRE LA VENTANA MAXIMIZADA
+            stage.setMaximized(true); // <-- AÑADE ESTA LÍNEA
+
             // Mostrar ventana
             stage.show();
 
@@ -209,7 +220,6 @@ public class MenuPrincipalController {
             mostrarError("No se pudo abrir la ventana de consulta de estudiante.\nError: " + e.getMessage());
         }
     }
-
     @FXML
     public void mostrarExtra() {
         try {
