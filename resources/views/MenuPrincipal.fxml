@@ -37,10 +37,10 @@
                 <Insets bottom="30" left="20" right="20" top="30" />
             </padding>
 
-            <Label style="-fx-font-size: 40px;" text="👨‍🏫" />
+            <Label style="-fx-font-size: 40px;" text="👨‍🏫" textFill="WHITE" />
             <Label style="-fx-text-fill: #2196F3; -fx-font-size: 18px; -fx-font-weight: bold;" text="DOCENTE" />
             <Separator prefWidth="150" />
-            <Text style="-fx-text-fill: #CCCCCC; -fx-font-size: 12px;" text="Acceso con contraseña para gestión completa del sistema académico." textAlignment="CENTER" wrappingWidth="180" />
+            <Text fill="WHITE" style="-fx-text-fill: #CCCCCC; -fx-font-size: 12px;" text="Acceso con contraseña para gestión completa del sistema académico." textAlignment="CENTER" wrappingWidth="180" />
 
             <Button fx:id="btnDocente" onAction="#abrirMenuProfesor" prefHeight="40" prefWidth="160" style="-fx-background-color: #2196F3; -fx-background-radius: 20; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="ACCEDER">
                 <effect>
@@ -56,10 +56,10 @@
                 <Insets bottom="30" left="20" right="20" top="30" />
             </padding>
 
-            <Label style="-fx-font-size: 40px;" text="👨‍🎓" />
+            <Label style="-fx-font-size: 40px;" text="👨‍🎓" textFill="WHITE" />
             <Label style="-fx-text-fill: #4CAF50; -fx-font-size: 18px; -fx-font-weight: bold;" text="ESTUDIANTE" />
             <Separator prefWidth="150" />
-            <Text style="-fx-text-fill: #CCCCCC; -fx-font-size: 12px;" text="Consulta de notas, promedios y estado académico con número de identificación." textAlignment="CENTER" wrappingWidth="180" />
+            <Text fill="WHITE" style="-fx-text-fill: #CCCCCC; -fx-font-size: 12px;" text="Consulta de notas, promedios y estado académico con número de identificación." textAlignment="CENTER" wrappingWidth="180" />
 
             <Button fx:id="btnEstudiante" onAction="#abrirMenuEstudiante" prefHeight="40" prefWidth="160" style="-fx-background-color: #4CAF50; -fx-background-radius: 20; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="CONSULTAR">
                 <effect>
@@ -75,10 +75,10 @@
                 <Insets bottom="30" left="20" right="20" top="30" />
             </padding>
 
-            <Label style="-fx-font-size: 40px;" text="💎" />
+            <Label style="-fx-font-size: 40px;" text="💎" textFill="WHITE" />
             <Label style="-fx-text-fill: #9C27B0; -fx-font-size: 18px; -fx-font-weight: bold;" text="PREMIUM" />
             <Separator prefWidth="150" />
-            <Text style="-fx-text-fill: #CCCCCC; -fx-font-size: 12px;" text="Descubre nuestros planes especiales y características premium disponibles." textAlignment="CENTER" wrappingWidth="180" />
+            <Text fill="WHITE" style="-fx-text-fill: #CCCCCC; -fx-font-size: 12px;" text="Descubre nuestros planes especiales y características premium disponibles." textAlignment="CENTER" wrappingWidth="180" />
 
             <Button fx:id="btnExtra" onAction="#mostrarExtra" prefHeight="40" prefWidth="160" style="-fx-background-color: #9C27B0; -fx-background-radius: 20; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="VER PLANES">
                 <effect>

@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="SistemaEstudiantes">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/APP_FINAL_COMPLETA_GESTION1.zip!/" />
+      <root url="jar://$PROJECT_DIR$/SistemaEstudiantes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
