@@ -53,6 +53,8 @@ Editar información existente
 
  Eliminar estudiantes
 
+ Asignar ID incremental a cada estudiante registrado
+
  Buscar por cc
 
  Visualizar en tabla interactiva
@@ -85,7 +87,7 @@ JavaFX	25.0.1	Interfaz gráfica
 SQLite	3.45.1.0	Base de datos embebida
 FXML	2.0	Diseño de interfaces
 CSS	3.0	Estilos y temas
-⚙️ Requisitos del Sistema
+ Requisitos del Sistema
 Software Requerido
 Java Development Kit (JDK) 21 o superior
 
@@ -102,41 +104,18 @@ Windows 10/11,
 
 Pantalla 1366x768 o superior
 
-🚀 Instalación y Ejecución
-Método 1: Ejecutar desde IntelliJ IDEA
-Clonar o descargar el proyecto
+ Instalación y Ejecución
 
-Abrir en IntelliJ IDEA
+Script de Ejecución (Windows)
+Descomprimir el archivo .zip
+# Ejecutar el archivo vbs
+INICIAR-FINAL.vbs
 
-Configurar SDK (Java 21+)
-
-Agregar librerías en Project Structure:
-
-lib/sqlite-jdbc.jar
-
-lib/javafx-sdk-25.0.1/lib/*
-
-Ejecutar Main.java
-
-Método 2: Script de Ejecución (Windows)
-bash
-# Ejecutar el archivo batch
-EjecutarApp.bat
-Método 3: Línea de Comandos
-bash
-# Compilar
-javac -cp "lib/sqlite-jdbc.jar;lib/javafx-sdk-25.0.1/lib/*" src/SistemaGestionEstudiantes/*.java
-
-# Ejecutar
-java --module-path "lib/javafx-sdk-25.0.1/lib" \
-     --add-modules javafx.controls,javafx.fxml \
-     -cp "lib/sqlite-jdbc.jar;src" \
-     SistemaGestionEstudiantes.Main
  Guía de Uso
 1. Pantalla Principal
 Seleccionar rol de usuario
 
-Ingresar contraseña correspondiente
+Ingresar contraseña correspondiente (profesor)
 
 Acceder a la interfaz específica
 
@@ -160,7 +139,7 @@ Consultar promedio general
 
 Esquema de Base de Datos
 Tabla: estudiantes
-sql
+SQLite
 CREATE TABLE estudiantes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     cc TEXT NOT NULL UNIQUE,
