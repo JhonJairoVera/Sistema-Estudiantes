@@ -27,3 +27,10 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+### MI PROYECTO ###
+*.jar
+*.zip  
+*.db
+APP_FINAL_COMPLETA/
+out/
+target/
