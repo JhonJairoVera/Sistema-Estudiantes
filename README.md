@@ -65,7 +65,7 @@ Registrar materias
 Calcular promedios
 
 
-💾 Base de Datos
+Base de Datos
 SQLite como motor de base de datos
 
 Tablas principales:
@@ -78,7 +78,7 @@ notas (id, id_estudiante, id_materia, nota)
 
 Persistencia automática de datos
 
-🛠️ Tecnologías Utilizadas
+ Tecnologías Utilizadas
 Tecnología	Versión	Propósito
 Java	JDK 21+	Lenguaje principal
 JavaFX	25.0.1	Interfaz gráfica
@@ -132,7 +132,7 @@ java --module-path "lib/javafx-sdk-25.0.1/lib" \
      --add-modules javafx.controls,javafx.fxml \
      -cp "lib/sqlite-jdbc.jar;src" \
      SistemaGestionEstudiantes.Main
-📖 Guía de Uso
+ Guía de Uso
 1. Pantalla Principal
 Seleccionar rol de usuario
 
