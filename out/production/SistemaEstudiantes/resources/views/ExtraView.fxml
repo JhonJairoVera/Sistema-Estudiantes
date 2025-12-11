@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="mainVBox" alignment="CENTER" spacing="20" style="-fx-padding: 30; -fx-background-color: #1D1D47;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SistemaGestionEstudiantes.controllers.ExtraController">
+
+    <!-- Título y botón cerrar -->
+    <HBox alignment="CENTER_RIGHT" spacing="20">
+        <Button onAction="#cerrarVentana" style="-fx-background-color: red; -fx-text-fill: white; -fx-font-weight: bold;" text="X" />
+    </HBox>
+
+    <!-- Imagen con tamaño inicial y propiedades para escalado -->
+    <ImageView fx:id="imagenPlan"
+               fitHeight="365.0"
+               fitWidth="521.0"
+               preserveRatio="true"
+               smooth="true"
+               cache="true" />
+
+    <Button onAction="#cerrarVentana" style="-fx-background-color: #73FFFF; -fx-text-fill: black; -fx-font-weight: bold;" text="ENTENDIDO" />
+
+</VBox>

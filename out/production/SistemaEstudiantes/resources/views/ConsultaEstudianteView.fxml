@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefHeight="700" prefWidth="850" spacing="15" style="-fx-padding: 20; -fx-background-color: #1D1D47;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SistemaGestionEstudiantes.controllers.ConsultaEstudianteController"> <!-- Fin contenedor principal -->
+
+       <!-- Botones -->
+    <HBox alignment="CENTER" prefHeight="46.0" prefWidth="748.0" spacing="30" style="-fx-padding: 20 0 0 0;" VBox.vgrow="NEVER">
+        <Button onAction="#nuevaBusqueda" style="-fx-background-color: #1a4baf; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-height: 40; -fx-pref-width: 180;" text="🔄 NUEVA BÚSQUEDA" />
+        <Button onAction="#cerrarVentana" style="-fx-background-color: #FF5252; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-height: 40; -fx-pref-width: 120;" text="❌ CERRAR" />
+    </HBox>
+
+    <!-- Título -->
+    <Label style="-fx-text-fill: #73FFFF; -fx-font-size: 28px; -fx-font-weight: bold;" text="📚 CONSULTA DE NOTAS" VBox.vgrow="NEVER" />
+
+    <!-- Campo de búsqueda -->
+    <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: #000000; -fx-background-radius: 10;" VBox.vgrow="NEVER">
+        <Label style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" text="INGRESE SU IDENTIFICACIÓN" />
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <TextField fx:id="txtIdentificacion" promptText="Ej: 123456789" style="-fx-pref-width: 300; -fx-pref-height: 35; -fx-font-size: 14px; -fx-background-radius: 5; -fx-text-fill: black;" />
+            <Button onAction="#buscarEstudiante" style="-fx-background-color: #1a4baf; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-height: 35; -fx-pref-width: 120;" text="🔍 BUSCAR" />
+        </HBox>
+    </VBox>
+
+    <!-- Información del estudiante -->
+    <VBox fx:id="infoEstudiante" spacing="10" style="-fx-padding: 15; -fx-background-color: #000000; -fx-background-radius: 10; -fx-opacity: 0;" visible="false" VBox.vgrow="NEVER">
+
+        <Label style="-fx-text-fill: #73FFFF; -fx-font-size: 18px; -fx-font-weight: bold;" text="📋 INFORMACIÓN DEL ESTUDIANTE" />
+
+        <GridPane hgap="20" vgap="10">
+            <Label style="-fx-text-fill: white;" text="Nombre:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <Label fx:id="lblNombre" style="-fx-text-fill: white; -fx-font-weight: bold;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+            <Label style="-fx-text-fill: white;" text="Identificación:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+            <Label fx:id="lblIdentificacion" style="-fx-text-fill: white; -fx-font-weight: bold;" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+
+            <Label style="-fx-text-fill: white;" text="ID:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <Label fx:id="lblId" style="-fx-text-fill: white; -fx-font-weight: bold;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+            <columnConstraints>
+                <ColumnConstraints />
+                <ColumnConstraints />
+                <ColumnConstraints />
+                <ColumnConstraints />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints />
+                <RowConstraints />
+            </rowConstraints>
+        </GridPane>
+    </VBox>
+
+    <!-- CONTENEDOR PRINCIPAL PARA TABLA Y MENSAJES - CON LÍMITE DE ALTURA -->
+    <VBox fx:id="contenedorPrincipal" maxHeight="450" spacing="15" VBox.vgrow="ALWAYS"> <!-- ¡ESTO ES IMPORTANTE! -->
+
+        <!-- Tabla de notas -->
+        <VBox fx:id="contenedorNotas" spacing="10" style="-fx-padding: 15; -fx-background-color: #000000; -fx-background-radius: 10; -fx-opacity: 0;" visible="false" VBox.vgrow="ALWAYS">
+
+            <Label style="-fx-text-fill: #73FFFF; -fx-font-size: 18px; -fx-font-weight: bold;" text="📊 NOTAS REGISTRADAS" VBox.vgrow="NEVER" />
+
+            <!-- TABLA CON ALTURA AJUSTABLE -->
+            <TableView fx:id="tablaNotas" minHeight="250" style="-fx-background-color: #2d2d2d;                              -fx-control-inner-background: #2d2d2d;                              -fx-table-cell-border-color: transparent;                              -fx-text-fill: white;                              -fx-font-size: 13px;" VBox.vgrow="ALWAYS">
+
+                <columns>
+                    <TableColumn fx:id="colMateria" prefWidth="200" text="MATERIA" />
+                    <TableColumn fx:id="colNotas" prefWidth="250" text="NOTAS" />
+                    <TableColumn fx:id="colPromedio" prefWidth="100" text="PROMEDIO" />
+                    <TableColumn fx:id="colEstado" prefWidth="100" text="ESTADO" />
+                </columns>
+            </TableView>
+
+            <!-- Promedio general -->
+            <HBox alignment="CENTER_RIGHT" spacing="20" style="-fx-padding: 10 0 0 0;" VBox.vgrow="NEVER">
+                <Label style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" text="PROMEDIO GENERAL:" />
+                <Label fx:id="lblPromedioGeneral" style="-fx-text-fill: #73FFFF; -fx-font-weight: bold; -fx-font-size: 18px;" />
+                <Label fx:id="lblEstadoGeneral" style="-fx-font-weight: bold; -fx-font-size: 16px;" />
+            </HBox>
+        </VBox>
+
+        <!-- Mensaje sin notas -->
+        <VBox fx:id="mensajeSinNotas" alignment="CENTER" style="-fx-padding: 30; -fx-background-color: #000000; -fx-background-radius: 10; -fx-opacity: 0;" visible="false" VBox.vgrow="ALWAYS">
+
+            <Label style="-fx-text-fill: #73FFFF; -fx-font-size: 20px; -fx-font-weight: bold;" text="📭 NO HAY NOTAS REGISTRADAS" />
+            <Label style="-fx-text-fill: white; -fx-font-size: 14px;" text="Este estudiante no tiene notas registradas en el sistema." />
+        </VBox>
+
+    </VBox>
+
+</VBox>
