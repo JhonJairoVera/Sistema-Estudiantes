@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="84dda285-5b6a-4bce-9f4c-5098a949c850" name="Changes" comment="Add files via upload" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "JhonJairoVera"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/JhonJairoVera/Sistema-Estudiantes.git",
+    "accountId": "4a070b91-2b4d-4bdc-86c3-1b8a990c5dee"
+  }
+}]]></component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/src/SistemaGestionEstudiantes/GestorMaterias.java" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/src/SistemaGestionEstudiantes/Main.java" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/src/SistemaGestionEstudiantes/MainApp.java" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 5
+}]]></component>
+  <component name="ProjectId" id="36iAgwIFqJGzBPlCsolBfO3ERZ3" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.Main.executor": "Run",
+    "Application.MainApp.executor": "Run",
+    "Application.SistemaEstudiantes.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.31724137"
+  }
+}]]></component>
+  <component name="RunManager" selected="Application.MainApp">
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="SistemaGestionEstudiantes.Main" />
+      <module name="SistemaEstudiantes" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="SistemaGestionEstudiantes.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MainApp" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="SistemaGestionEstudiantes.MainApp" />
+      <module name="SistemaEstudiantes" />
+      <option name="VM_PARAMETERS" value="--module-path &quot;$USER_HOME$/Downloads/openjfx-25.0.1_windows-x64_bin-sdk/javafx-sdk-25.0.1/lib&quot; --add-modules javafx.controls,javafx.fxml --add-opens javafx.graphics/com.sun.javafx.tk=ALL-UNNAMED -Dprism.order=sw" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="SistemaGestionEstudiantes.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Application.Main" />
+      <item itemvalue="Application.MainApp" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.MainApp" />
+        <item itemvalue="Application.Main" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="84dda285-5b6a-4bce-9f4c-5098a949c850" name="Changes" comment="" />
+      <created>1765479133873</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1765479133873</updated>
+    </task>
+    <task id="LOCAL-00001" summary="Add files via upload">
+      <option name="closed" value="true" />
+      <created>1765483396069</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1765483396069</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="VERSION FINAL" />
+    <MESSAGE value="Add files via upload" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add files via upload" />
+  </component>
+</project>
