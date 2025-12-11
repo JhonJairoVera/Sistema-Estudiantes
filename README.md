@@ -40,7 +40,7 @@ SistemaEstudiantes/
 └── README.md                        # Este archivo
  Características Principales
 Sistema de Acceso
-Tres roles de usuario: Estudiante, Profesor, Administrador
+Dos de usuario: Estudiante, Profesor.
 
 Autenticación por contraseña (actualmente: 1234 para profesor)
 
